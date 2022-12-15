@@ -1,6 +1,6 @@
 # awang.ga knowledge sharing
 About Me :
-* [link](ttps://irc.ulbi.ac.id/ "Informatics Research Center") Labs ULBI
+* [link](https://irc.ulbi.ac.id/ "Informatics Research Center") ULBI
 * [link](https://wa.me/628112000279?text=panduan "Iteung Chatbot") Lead Dev
 * [link](https://www.bukupedia.co.id/ "Bukupedia") Steering Committe
 * International Journal Reviewer
