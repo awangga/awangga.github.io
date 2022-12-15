@@ -1,4 +1,4 @@
-# About Me
+# Rolly Maulana Awangga
 
 * [Informatics Research Center](https://irc.ulbi.ac.id/ "Informatics Research Center") ULBI
 * [Iteung Chatbot](https://wa.me/628112000279?text=panduan "Iteung Chatbot") Lead Dev
