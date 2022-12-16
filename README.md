@@ -27,3 +27,8 @@
 4. make it public
 5. Add README.md
 6. Create
+
+### Set Up Template for Github Page
+1. Choose [Supported Themes](https://pages.github.com/themes/)
+2. Go To Usage section
+3. Update README.md
