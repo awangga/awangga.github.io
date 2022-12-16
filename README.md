@@ -16,5 +16,14 @@
     - [Offline Book](https://shopee.co.id/search?keyword=rolly%20awangga)
 
 ## Introduction to Git and Github
+
+### Intodcution
 [Intro to Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
 
+### Create Account and Repository
+1. Open github.com and Sign Up
+2. Klik Plus and New Repository
+3. Name it with username.github.io
+4. make it public
+5. Add README.md
+6. Create
