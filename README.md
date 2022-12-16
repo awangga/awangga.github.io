@@ -2,7 +2,7 @@
 
 * [Informatics Research Center](https://irc.ulbi.ac.id/ "Informatics Research Center") ULBI
 * [Iteung Chatbot](https://wa.me/628112000279?text=panduan "Iteung Chatbot") Lead Dev
-* [Bukupedia](https://www.bukupedia.co.id/ "Bukupedia") Steering Committe
+* [Bukupedia](https://www.bukupedia.co.id/ "Bukupedia") Founder
 * International Journal Reviewer
 * Sinta Journal Reviewer
 * Scopus ID : [57200415037](https://www.scopus.com/authid/detail.uri?authorId=57200415037 "57200415037")
