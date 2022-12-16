@@ -33,3 +33,4 @@
 1. Choose [Supported Themes](https://pages.github.com/themes/)
 2. Go To Usage section
 3. Update README.md
+4. Go to Settings under Pages Section
