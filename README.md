@@ -18,7 +18,8 @@
 ## Github Pages
 
 ### Introduction
-[About Git and Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
+1. [About Git and Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
+2. [Jobs require git](https://www.linkedin.com/jobs/search/?currentJobId=3382401033&geoId=102478259&keywords=developer&location=Indonesia&refresh=true)
 
 ### Create Account and Repository
 1. Open github.com and Sign Up
