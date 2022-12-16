@@ -7,6 +7,7 @@
 * Journal Reviewer : [JTE Unnes](https://journal.unnes.ac.id/nju/index.php/jte/about/displayMembership/352) | [ELKOMIKA ITENAS](https://ejurnal.itenas.ac.id/index.php/elkomika/about/displayMembership/5) | [SINTECH STIKI](https://jurnal.stiki-indonesia.ac.id/index.php/sintechjournal/reviewer) | [JNKTI USM](https://ojs.serambimekkah.ac.id/index.php/jnkti/pages/view/Reviewers)
 * Scopus ID : [57200415037](https://www.scopus.com/authid/detail.uri?authorId=57200415037 "57200415037")
 * Google Scholar ID : [zN-ay84AAAAJ](https://scholar.google.com/citations?user=zN-ay84AAAAJ&hl=id "zN-ay84AAAAJ")
+* Books Author : [Online Book](https://play.google.com/store/search?q=rolly%20awangga&c=books) | [Offline Book](https://shopee.co.id/search?keyword=rolly%20awangga)
 
 ## Introduction to Git and Github
 [Intro to Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
