@@ -15,10 +15,10 @@
     - [Online Book](https://play.google.com/store/search?q=rolly%20awangga&c=books)
     - [Offline Book](https://shopee.co.id/search?keyword=rolly%20awangga)
 
-## Introduction to Git and Github
+## Github Pages
 
-### Intodcution
-[Intro to Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
+### Introduction
+[About Git and Github](https://www.jhsph.edu/research/centers-and-institutes/welch-center-for-prevention-epidemiology-and-clinical-research/events/grand-rounds/presentations/191120%20intro_to_git_github.pdf "Intro to Github")
 
 ### Create Account and Repository
 1. Open github.com and Sign Up
