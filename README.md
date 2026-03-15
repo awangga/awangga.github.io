@@ -26,5 +26,7 @@ Expand-Archive -Path "C:\Windows\Temp\WpdPack_4_1_2.zip" -DestinationPath "C:\"
 
 ```ps
 gem install pcaprub
+ruby -v
+gem install bundler
 Install-WinGetPackage -id PostgreSQL.PostgreSQL.17
 ```
