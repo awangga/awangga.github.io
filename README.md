@@ -1,7 +1,3 @@
----
-title: "Kalo kamu bisa, kenapa harus saya?"
----
-
 # Setup dan Konfigurasi
 
 Install WinGet mode Administrator
