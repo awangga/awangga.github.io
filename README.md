@@ -1,3 +1,7 @@
+---
+title: ""
+---
+
 # Setup dan Konfigurasi
 
 Install WinGet mode Administrator
