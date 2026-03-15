@@ -16,6 +16,14 @@ Write-Host "Done."
 ![alt text](image.png)  
 ![alt text](image-1.png)
 
+Install pcaprub dependencies dari PowerShell Administrator
+
+```ps
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true} ; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object System.Net.WebClient).DownloadFile('https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip', 'C:\Windows\Temp\WpdPack_4_1_2.zip')
+
+Expand-Archive -Path "C:\Windows\Temp\WpdPack_4_1_2.zip" -DestinationPath "C:\"
+```
+
 ```ps
 gem install pcaprub
 Install-WinGetPackage -id PostgreSQL.PostgreSQL.17
