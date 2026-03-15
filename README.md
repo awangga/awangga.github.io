@@ -11,6 +11,11 @@ Repair-WinGetPackageManager -AllUsers
 Write-Host "Done."
 ```
 
+Install Cloudflared
+```ps1
+winget install --id Cloudflare.cloudflared
+```
+
 [Install Ruby](https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.3.6-1/rubyinstaller-devkit-3.3.6-1-x64.exe)
 
 ![alt text](image.png)  
