@@ -18,4 +18,5 @@ Write-Host "Done."
 
 ```ps
 gem install pcaprub
+Install-WinGetPackage -id PostgreSQL.PostgreSQL.17
 ```
