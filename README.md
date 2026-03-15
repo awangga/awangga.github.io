@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Kalo kamu bisa, kenapa harus saya?"
 ---
 
 # Setup dan Konfigurasi
