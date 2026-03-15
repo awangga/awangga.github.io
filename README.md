@@ -13,4 +13,9 @@ Write-Host "Done."
 
 [Install Ruby](https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.3.6-1/rubyinstaller-devkit-3.3.6-1-x64.exe)
 
-![alt text](image.png)
+![alt text](image.png)  
+![alt text](image-1.png)
+
+```ps
+gem install pcaprub
+```
