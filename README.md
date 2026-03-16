@@ -40,7 +40,7 @@ Read Log and Post
 Start-Sleep -Seconds 5
 
 $logPath = "$HOME\tunnel.log"
-$apiUrl = "https://webhook.site/3bfc5b52-e8cb-4e60-9cec-68fd5bdde08c" # Ganti dengan URL API Bapak
+$apiUrl = "https://webhook.site/3bfc5b52-e8cb-4e60-9cec-68fd5bdde08c" # Ganti dengan URL API
 
 # Mencari pola URL trycloudflare di dalam log
 $content = Get-Content $logPath -Raw
