@@ -27,6 +27,43 @@ Host *.trycloudflare.com
   ProxyCommand cloudflared access ssh --hostname %h
 ```
 
+Hidden Running Powershell
+```ps1
+Start-Process -FilePath "cloudflared.exe" `
+-ArgumentList "tunnel --url ssh://127.0.0.1:50123 --logfile $HOME\tunnel.log" `
+-WindowStyle Hidden
+```
+
+Read Log and Post
+```ps1
+# Tunggu beberapa detik sampai log terisi
+Start-Sleep -Seconds 5
+
+$logPath = "$HOME\tunnel.log"
+$apiUrl = "https://api.anda.com/endpoint" # Ganti dengan URL API Bapak
+
+# Mencari pola URL trycloudflare di dalam log
+$content = Get-Content $logPath -Raw
+$match = [regex]::Match($content, 'https://[a-zA-Z0-9-]+\.trycloudflare\.com')
+
+if ($match.Success) {
+    $tunnelUrl = $match.Value
+    Write-Host "URL Ditemukan: $tunnelUrl"
+
+    # Kirim ke API menggunakan Method POST
+    $body = @{
+        url = $tunnelUrl
+        timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+        status = "active"
+    } | ConvertTo-Json
+
+    Invoke-RestMethod -Uri $apiUrl -Method Post -Body $body -ContentType "application/json"
+    Write-Host "Berhasil dikirim ke API."
+} else {
+    Write-Host "URL tidak ditemukan di log. Pastikan tunnel berjalan."
+}
+```
+
 [Install Ruby](https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.3.6-1/rubyinstaller-devkit-3.3.6-1-x64.exe)
 
 ![alt text](image.png)  
