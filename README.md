@@ -15,11 +15,17 @@ Use public SSH
 cloudflared tunnel --url ssh://127.0.0.1:50123
 ```
 
-Config : 
+![alt text](image-2.png)
+SFTP Config : 
 ```ps1
 cloudflared access ssh --hostname %host
 ```
 
+.ssh/config
+```ps1
+Host *.trycloudflare.com
+  ProxyCommand cloudflared access ssh --hostname %h
+```
 
 [Install Ruby](https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.3.6-1/rubyinstaller-devkit-3.3.6-1-x64.exe)
 
