@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Konseptual SUO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        canvas { border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .btn-active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        .btn-inactive { background-color: transparent; color: #94a3b8; border-color: #475569; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+
+    <div class="max-w-4xl w-full">
+        <header class="mb-6 text-center sm:text-left">
+            <h1 class="text-3xl font-bold text-blue-400 mb-2">Simulasi Konseptual Algoritma SUO</h1>
+            <p class="text-slate-400 text-sm">Visualisasi cara kerja algoritma optimasi berbasis micro-swarm dalam mencari Global Minimum pada ruang pencarian yang kompleks.</p>
+        </header>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Canvas Area -->
+            <div class="flex-1">
+                <div class="relative w-full aspect-video bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+                    <canvas id="simCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="w-full md:w-80 bg-slate-800 p-5 rounded-lg border border-slate-700 flex flex-col gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-200 mb-3">Pilih Mode Operasi</h2>
+                    <div class="flex flex-col gap-2">
+                        <button id="btnPhase1" class="btn-active border px-4 py-2 rounded transition-colors text-left hover:bg-blue-600">
+                            <span class="block font-bold">1. Eksploitasi Cepat</span>
+                            <span class="text-xs opacity-80">1 Micro-swarm (3 Agen). Cepat, tapi rawan terjebak di Local Optima.</span>
+                        </button>
+                        <button id="btnPhase2" class="btn-inactive border px-4 py-2 rounded transition-colors text-left hover:border-slate-400">
+                            <span class="block font-bold">2. Keseimbangan Global</span>
+                            <span class="text-xs opacity-80">10 Micro-swarm (@6 Agen). Eksplorasi luas untuk mencari Global Optima.</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-2">
+                    <button id="btnReset" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition-colors">
+                        Acak Ulang Posisi (Reset)
+                    </button>
+                </div>
+
+                <div class="mt-4 p-3 bg-slate-900 rounded border border-slate-700 text-sm">
+                    <h3 class="font-bold text-slate-300 mb-2">Keterangan:</h3>
+                    <ul class="space-y-1 text-slate-400">
+                        <li><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span> Titik Agen Pencari</li>
+                        <li><span class="inline-block w-3 h-3 rounded-full bg-yellow-400 mr-2"></span> Posisi Terbaik Ditemukan</li>
+                        <li><span class="text-red-400 font-bold">Zona Gelap:</span> Area Lembah/Minimum</li>
+                        <li><span class="text-white font-bold">Zona Terang:</span> Area Puncak/Maksimum</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        // Kontrol UI
+        const btnPhase1 = document.getElementById('btnPhase1');
+        const btnPhase2 = document.getElementById('btnPhase2');
+        const btnReset = document.getElementById('btnReset');
+
+        // Parameter Simulasi
+        let currentPhase = 1; 
+        let swarms = [];
+        let globalBest = { x: 0, y: 0, fitness: Infinity };
+        let animationId;
+
+        // Fungsi Objektif (Lanskap Topografi Fiktif)
+        // Kita membuat beberapa "lembah" (minima). Tujuan algoritma adalah mencari lembah terdalam.
+        const landscapeFeatures = [
+            { x: 0.2, y: 0.3, depth: 50, radius: 0.2, type: 'local' },
+            { x: 0.8, y: 0.2, depth: 70, radius: 0.25, type: 'local' },
+            { x: 0.2, y: 0.8, depth: 60, radius: 0.15, type: 'local' },
+            { x: 0.7, y: 0.7, depth: 100, radius: 0.3, type: 'global' } // Ini target aslinya!
+        ];
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            width = canvas.width;
+            height = canvas.height;
+            initSimulation();
+        }
+
+        // Menghitung nilai fungsi (fitness) di koordinat tertentu (semakin kecil semakin baik)
+        function getFitness(nx, ny) {
+            let val = 100; // Base landscape height
+            landscapeFeatures.forEach(f => {
+                const dx = nx - f.x;
+                const dy = ny - f.y;
+                const distSq = dx*dx + dy*dy;
+                // Gaussian well
+                val -= f.depth * Math.exp(-distSq / (2 * Math.pow(f.radius, 2)));
+            });
+            // Tambahan sedikit noise agar tidak terlalu mulus
+            val += Math.sin(nx * 20) * Math.cos(ny * 20) * 2;
+            return val;
+        }
+
+        class Agent {
+            constructor(swarmId, color, startX, startY) {
+                this.swarmId = swarmId;
+                this.color = color;
+                this.x = startX;
+                this.y = startY;
+                this.vx = (Math.random() - 0.5) * 0.01;
+                this.vy = (Math.random() - 0.5) * 0.01;
+                this.bestX = this.x;
+                this.bestY = this.y;
+                this.bestFitness = getFitness(this.x, this.y);
+            }
+
+            update(swarmBest, isGlobalPhase) {
+                const currentFitness = getFitness(this.x, this.y);
+                
+                // Update personal best
+                if (currentFitness < this.bestFitness) {
+                    this.bestFitness = currentFitness;
+                    this.bestX = this.x;
+                    this.bestY = this.y;
+                }
+
+                // Update global best
+                if (currentFitness < globalBest.fitness) {
+                    globalBest.fitness = currentFitness;
+                    globalBest.x = this.x;
+                    globalBest.y = this.y;
+                }
+
+                // Logika pergerakan (Sangat disederhanakan, metaphor-free logic)
+                // Berbasis ketertarikan matematis ke posisi terbaik
+                let r1 = Math.random();
+                let r2 = Math.random();
+                let r3 = Math.random();
+
+                // Eksploitasi: Tarikan ke arah swarm best
+                let forceX = (swarmBest.x - this.x) * r1 * 0.05;
+                let forceY = (swarmBest.y - this.y) * r1 * 0.05;
+
+                if (isGlobalPhase) {
+                    // Eksplorasi: Ada gaya acak dan sesekali melihat global best
+                    forceX += (globalBest.x - this.x) * r2 * 0.02;
+                    forceY += (globalBest.y - this.y) * r2 * 0.02;
+                    
+                    // Mutasi / pergerakan acak (self-adaptation)
+                    forceX += (Math.random() - 0.5) * 0.01;
+                    forceY += (Math.random() - 0.5) * 0.01;
+                } else {
+                    // Eksploitasi ekstrim (Phase 1): Cepat konvergen ke satu titik
+                    forceX += (swarmBest.x - this.x) * r3 * 0.1;
+                    forceY += (swarmBest.y - this.y) * r3 * 0.1;
+                }
+
+                this.vx = this.vx * 0.9 + forceX; // 0.9 = inersia
+                this.vy = this.vy * 0.9 + forceY;
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Batasi pergerakan di dalam kotak [0, 1]
+                if (this.x < 0) { this.x = 0; this.vx *= -1; }
+                if (this.x > 1) { this.x = 1; this.vx *= -1; }
+                if (this.y < 0) { this.y = 0; this.vy *= -1; }
+                if (this.y > 1) { this.y = 1; this.vy *= -1; }
+            }
+        }
+
+        class Swarm {
+            constructor(id, numAgents, color, startX, startY) {
+                this.id = id;
+                this.agents = [];
+                this.bestX = startX;
+                this.bestY = startY;
+                this.bestFitness = Infinity;
+                
+                for (let i = 0; i < numAgents; i++) {
+                    // Sebar di sekitar titik awal
+                    let px = Math.max(0, Math.min(1, startX + (Math.random()-0.5)*0.1));
+                    let py = Math.max(0, Math.min(1, startY + (Math.random()-0.5)*0.1));
+                    this.agents.push(new Agent(id, color, px, py));
+                }
+            }
+
+            update(isGlobalPhase) {
+                // Temukan swarm best saat ini
+                this.agents.forEach(a => {
+                    if (a.bestFitness < this.bestFitness) {
+                        this.bestFitness = a.bestFitness;
+                        this.bestX = a.bestX;
+                        this.bestY = a.bestY;
+                    }
+                });
+
+                // Update posisi semua agen di swarm ini
+                this.agents.forEach(a => {
+                    a.update({x: this.bestX, y: this.bestY}, isGlobalPhase);
+                });
+            }
+        }
+
+        function initSimulation() {
+            swarms = [];
+            globalBest = { x: 0, y: 0, fitness: Infinity };
+            
+            // Generate warna palet
+            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#64748b', '#84cc16'];
+
+            if (currentPhase === 1) {
+                // FASE 1: 1 Micro-swarm, 3 Agen (Terpusat di suatu tempat secara acak)
+                let startX = Math.random();
+                let startY = Math.random();
+                swarms.push(new Swarm(0, 3, colors[0], startX, startY));
+            } else {
+                // FASE 2: 10 Micro-swarm, masing-masing 6 Agen (Tersebar luas)
+                for (let i = 0; i < 10; i++) {
+                    let startX = Math.random();
+                    let startY = Math.random();
+                    swarms.push(new Swarm(i, 6, colors[i], startX, startY));
+                }
+            }
+        }
+
+        function drawLandscape() {
+            // Menggambar latar belakang kontur sederhana
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#1e293b'); // Abu gelap (Tinggi)
+            gradient.addColorStop(1, '#0f172a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Menggambar lembah (Minima)
+            landscapeFeatures.forEach(f => {
+                const cx = f.x * width;
+                const cy = f.y * height;
+                const r = f.radius * width;
+                
+                const radGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                if(f.type === 'global') {
+                    // Lembah global lebih gelap (target utama)
+                    radGrad.addColorStop(0, 'rgba(0, 0, 0, 0.8)'); 
+                    radGrad.addColorStop(1, 'rgba(30, 41, 59, 0)');
+                } else {
+                    // Lembah lokal (jebakan)
+                    radGrad.addColorStop(0, 'rgba(15, 23, 42, 0.9)'); 
+                    radGrad.addColorStop(1, 'rgba(30, 41, 59, 0)');
+                }
+
+                ctx.fillStyle = radGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Lingkaran penanda ringan
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.beginPath();
+                ctx.arc(cx, cy, r*0.5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(cx, cy, r*0.2, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+
+        function draw() {
+            drawLandscape();
+
+            // Gambar agen
+            swarms.forEach(swarm => {
+                swarm.agents.forEach(agent => {
+                    ctx.fillStyle = agent.color;
+                    ctx.beginPath();
+                    ctx.arc(agent.x * width, agent.y * height, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Jejak tipis ke swarm best
+                    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                    ctx.beginPath();
+                    ctx.moveTo(agent.x * width, agent.y * height);
+                    ctx.lineTo(swarm.bestX * width, swarm.bestY * height);
+                    ctx.stroke();
+                });
+            });
+
+            // Gambar Global Best mark
+            if (globalBest.fitness !== Infinity) {
+                ctx.fillStyle = '#fbbf24'; // Kuning
+                ctx.beginPath();
+                ctx.arc(globalBest.x * width, globalBest.y * height, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Efek denyut
+                let pulse = Math.abs(Math.sin(Date.now() / 200)) * 10;
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(globalBest.x * width, globalBest.y * height, 8 + pulse, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function loop() {
+            swarms.forEach(swarm => swarm.update(currentPhase === 2));
+            draw();
+            animationId = requestAnimationFrame(loop);
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', resize);
+        
+        btnPhase1.addEventListener('click', () => {
+            currentPhase = 1;
+            btnPhase1.className = 'btn-active border px-4 py-2 rounded transition-colors text-left';
+            btnPhase2.className = 'btn-inactive border px-4 py-2 rounded transition-colors text-left hover:border-slate-400';
+            initSimulation();
+        });
+
+        btnPhase2.addEventListener('click', () => {
+            currentPhase = 2;
+            btnPhase2.className = 'btn-active border px-4 py-2 rounded transition-colors text-left';
+            btnPhase1.className = 'btn-inactive border px-4 py-2 rounded transition-colors text-left hover:border-slate-400';
+            initSimulation();
+        });
+
+        btnReset.addEventListener('click', initSimulation);
+
+        // Mulai simulasi
+        resize(); // Init dan set ukuran
+        loop();
+    </script>
+</body>
+</html>
