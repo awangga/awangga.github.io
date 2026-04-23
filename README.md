@@ -40,7 +40,8 @@ Model menyembunyikan atau memanipulasi sebagian dari data tersebut, lalu mencoba
 #### Cara A: Memprediksi Bagian yang Hilang (*Generative / Masking*)
 Ini paling sering dipakai di teks (seperti ChatGPT atau BERT) dan belakangan mulai populer di gambar (*Masked Autoencoders*).
 * **Logikanya:** Seperti mengisi teka-teki rumpang atau *fill-in-the-blank*.
-* **Prosesnya:** 1. Ambil kalimat asli: "Budi pergi ke *pasar* untuk membeli sayur."
+* **Prosesnya:**
+    1. Ambil kalimat asli: "Budi pergi ke *pasar* untuk membeli sayur."
     2. Model menghapus satu kata secara acak: "Budi pergi ke **[MASK]** untuk membeli sayur."
     3. Model ditantang untuk menebak kata yang hilang.
     4. Karena kalimat aslinya sudah ada di *database*, sistem otomatis tahu kunci jawabannya adalah "pasar". Jika tebakan model salah, ia akan mengoreksi dirinya sendiri. **Tidak butuh manusia untuk melabeli kata per kata.**
