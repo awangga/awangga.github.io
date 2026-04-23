@@ -56,5 +56,19 @@ Ini cara yang memakai "augmentation policy" yang kamu sebutkan tadi, sangat popu
     4. Tugas model adalah **menarik** nilai matematika dari dua versi "Gambar A" agar berdekatan (karena berasal dari sumber yang sama), dan **mendorong** nilainya menjauh dari "Gambar B".
     5. **Kunci jawabannya:** Sistem secara otomatis tahu versi mana yang harus didekatkan karena sistem sendirilah yang membuat versi augmentasi tersebut. Lagi-lagi, tidak butuh label dari manusia.
 
+#### Cara C: Saling Berkompetisi / Bertarung (*Adversarial Learning*)
+Ini adalah metode yang sangat populer untuk menciptakan data sintesis yang luar biasa realistis (seperti gambar AI, suara tiruan, atau video *Deepfake*), utamanya menggunakan arsitektur GANs (*Generative Adversarial Networks*).
+
+* **Logikanya:** Bermain peran "polisi dan pencuri". AI memecah dirinya menjadi dua agen—satu bertugas memalsukan data, satu lagi bertugas mendeteksi kepalsuan. Keduanya saling bertarung dan belajar dari kesalahan masing-masing agar menjadi semakin ahli.
+* **Prosesnya:**
+    1. Sistem menyiapkan dua agen AI: **Generator** (Si Pemalsu) dan **Discriminator** (Si Detektif).
+    2. *Generator* mencoba membuat sebuah data palsu (misalnya gambar wajah manusia) dari sebuah coretan piksel acak (*noise*).
+    3. Sistem mengambil satu gambar wajah asli dari *database*.
+    4. *Discriminator* (Si Detektif) diberikan kedua gambar tersebut dan ditugaskan untuk membedakan mana gambar yang asli dan mana gambar buatan *Generator*.
+    5. **Kunci jawabannya:** Sistem secara otomatis sudah tahu persis asal-usul kedua gambar tersebut (karena sistem yang menyuapkannya). 
+        * Jika *Discriminator* berhasil membongkar gambar palsu, maka **Generator yang dihukum/dikoreksi** agar belajar membuat tekstur gambar yang lebih meyakinkan.
+        * Sebaliknya, jika *Generator* berhasil menipu *Discriminator* (mengira gambar buatan AI itu asli), maka **Discriminator yang dihukum/dikoreksi** agar menjadi detektif yang lebih teliti ke depannya.
+
+
 **Kesimpulan:**
 Dengan memecahkan "teka-teki" (menebak kata yang hilang atau mencocokkan gambar yang diaugmentasi) pada jutaan data yang tidak berlabel, model akhirnya mengerti tata bahasa, konteks, garis, warna, dan struktur visual secara mendalam. 
