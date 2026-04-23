@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komparasi KMA vs SUO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh;}
+        .container { max-w: 1000px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        canvas { border-radius: 8px; background-color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
+        .canvas-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; }
+        .canvas-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        button { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold text-white mb-2">Komparasi Perilaku: KMA vs SUO</h1>
+        <p class="text-slate-400">Visualisasi perbedaan gaya pencarian "Mlipir" (Komodo) dan "Micro-Swarm" (SUO)</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Panel KMA -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <h2 class="text-xl font-bold text-amber-500 mb-2">Komodo Mlipir Algorithm (KMA)</h2>
+            <p class="text-xs text-slate-400 mb-4 h-12">Berbasis Metafora. Agen terburuk akan "kabur/mlipir" dari area dominan untuk mengeksplorasi tempat baru.</p>
+            <div class="canvas-wrapper">
+                <canvas id="bgKma" class="canvas-layer"></canvas>
+                <canvas id="kmaCanvas" class="canvas-layer"></canvas>
+            </div>
+            <div class="mt-4 p-3 bg-slate-900 rounded text-xs flex justify-between">
+                <span class="text-amber-400 font-bold" id="kmaFitness">Best: 0</span>
+                <span class="text-slate-400">Iterasi: <span id="kmaIter">0</span></span>
+            </div>
+            <div class="mt-2 text-[10px] text-slate-500 flex gap-2 justify-center">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Dominan</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Biasa</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-400"></span> Kecil (Mlipir)</span>
+            </div>
+        </div>
+
+        <!-- Panel SUO -->
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+            <h2 class="text-xl font-bold text-blue-500 mb-2">Scalable Universal Optimizer (SUO)</h2>
+            <p class="text-xs text-slate-400 mb-4 h-12">Tanpa Metafora. Bergerak terstruktur dalam sub-kelompok kecil (Micro-swarm) yang saling berbagi informasi.</p>
+            <div class="canvas-wrapper">
+                <canvas id="bgSuo" class="canvas-layer"></canvas>
+                <canvas id="suoCanvas" class="canvas-layer"></canvas>
+            </div>
+            <div class="mt-4 p-3 bg-slate-900 rounded text-xs flex justify-between">
+                <span class="text-blue-400 font-bold" id="suoFitness">Best: 0</span>
+                <span class="text-slate-400">Iterasi: <span id="suoIter">0</span></span>
+            </div>
+            <div class="mt-2 text-[10px] text-slate-500 flex gap-2 justify-center">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Micro-Swarm</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-center mt-4">
+        <button id="btnRestart" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-lg font-bold shadow-lg transition-all">
+            Mulai / Ulangi Balapan
+        </button>
+    </div>
+</div>
+
+<script>
+    // --- LINGKUNGAN (LANDSCAPE) SAMA UNTUK KEDUANYA ---
+    const landscapeFeatures = [
+        { x: 0.15, y: 0.2, depth: 60, radius: 0.15 }, // Local
+        { x: 0.8, y: 0.2, depth: 80, radius: 0.2 },  // Local
+        { x: 0.2, y: 0.8, depth: 70, radius: 0.18 }, // Local
+        { x: 0.75, y: 0.75, depth: 120, radius: 0.25 } // GLOBAL MINIMUM
+    ];
+
+    function getFitness(nx, ny) {
+        let val = 200;
+        landscapeFeatures.forEach(f => {
+            const dx = nx - f.x; const dy = ny - f.y;
+            val -= f.depth * Math.exp(-(dx*dx + dy*dy) / (2 * f.radius*f.radius));
+        });
+        val += Math.sin(nx * 20) * Math.cos(ny * 20) * 2; // Noise
+        return val;
+    }
+
+    function drawLandscape(canvasId) {
+        const c = document.getElementById(canvasId);
+        const ctx = c.getContext('2d');
+        const w = c.width = c.parentElement.clientWidth;
+        const h = c.height = c.parentElement.clientHeight;
+
+        const grad = ctx.createLinearGradient(0,0,w,h);
+        grad.addColorStop(0, '#1e293b'); grad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+
+        landscapeFeatures.forEach(f => {
+            const radGrad = ctx.createRadialGradient(f.x*w, f.y*h, 0, f.x*w, f.y*h, f.radius*w);
+            radGrad.addColorStop(0, f.depth > 100 ? 'rgba(0,0,0,0.8)' : 'rgba(15,23,42,0.9)');
+            radGrad.addColorStop(1, 'rgba(30,41,59,0)');
+            ctx.fillStyle = radGrad;
+            ctx.beginPath(); ctx.arc(f.x*w, f.y*h, f.radius*w, 0, Math.PI*2); ctx.fill();
+        });
+    }
+
+    // --- ALGORITMA KMA (KOMODO) ---
+    class Komodo {
+        constructor() {
+            this.x = Math.random(); this.y = Math.random();
+            this.fitness = getFitness(this.x, this.y);
+            this.rank = 0; // 0=Big, 1=Female, 2=Small
+        }
+    }
+
+    let komodos = [];
+    let kmaBest = {x:0, y:0, fit:Infinity};
+    let kmaIter = 0;
+
+    function initKMA() {
+        komodos = Array.from({length: 30}, () => new Komodo());
+        kmaBest = {x:0, y:0, fit:Infinity};
+        kmaIter = 0;
+    }
+
+    function stepKMA() {
+        // Sort by fitness (Kecil = Baik)
+        komodos.sort((a, b) => a.fitness - b.fitness);
+        
+        const top = komodos[0];
+        if(top.fitness < kmaBest.fit) { kmaBest = {x: top.x, y: top.y, fit: top.fitness}; }
+
+        // Tentukan ranking (Simplikasi KMA)
+        const bigCount = 3;
+        const femaleCount = 12;
+
+        for(let i=0; i<komodos.length; i++) {
+            let k = komodos[i];
+            let r1 = Math.random();
+            
+            if (i < bigCount) {
+                // Komodo Besar: Eksploitasi dekat best
+                k.rank = 0;
+                k.x += (kmaBest.x - k.x) * r1 * 0.1 + (Math.random()-0.5)*0.01;
+                k.y += (kmaBest.y - k.y) * r1 * 0.1 + (Math.random()-0.5)*0.01;
+            } else if (i < bigCount + femaleCount) {
+                // Komodo Betina: Bergerak menuju dominan
+                k.rank = 1;
+                let target = komodos[Math.floor(Math.random() * bigCount)];
+                k.x += (target.x - k.x) * r1 * 0.2;
+                k.y += (target.y - k.y) * r1 * 0.2;
+            } else {
+                // Komodo Kecil: MLIPIR! Menjauh dari dominan/area buruk, lompat ke area acak
+                k.rank = 2;
+                // Logika mlipir: jika dekat dengan yang besar, lompat jauh
+                let distToBest = Math.sqrt(Math.pow(k.x-kmaBest.x, 2) + Math.pow(k.y-kmaBest.y, 2));
+                if(distToBest < 0.3) {
+                    // Lompat menjauh (Mlipir)
+                    k.x = Math.random(); 
+                    k.y = Math.random();
+                } else {
+                    // Jalan acak perlahan
+                    k.x += (Math.random()-0.5)*0.1;
+                    k.y += (Math.random()-0.5)*0.1;
+                }
+            }
+
+            // Batasan area
+            k.x = Math.max(0, Math.min(1, k.x)); k.y = Math.max(0, Math.min(1, k.y));
+            k.fitness = getFitness(k.x, k.y);
+        }
+        kmaIter++;
+    }
+
+    // --- ALGORITMA SUO (UNIVERSAL) ---
+    class SuoAgent {
+        constructor(groupId) {
+            this.groupId = groupId;
+            this.x = Math.random(); this.y = Math.random();
+            this.vx = 0; this.vy = 0;
+            this.bestX = this.x; this.bestY = this.y;
+            this.fit = getFitness(this.x, this.y);
+            this.bestFit = this.fit;
+        }
+    }
+
+    let suoGroups = []; // Array of Arrays
+    let suoBest = {x:0, y:0, fit:Infinity};
+    let suoIter = 0;
+
+    function initSUO() {
+        suoGroups = [];
+        // 5 Groups, each 6 agents (Total 30)
+        for(let g=0; g<5; g++) {
+            let group = Array.from({length: 6}, () => new SuoAgent(g));
+            suoGroups.push(group);
+        }
+        suoBest = {x:0, y:0, fit:Infinity};
+        suoIter = 0;
+    }
+
+    function stepSUO() {
+        suoGroups.forEach(group => {
+            // Find Group Best
+            let gBest = {x:group[0].x, y:group[0].y, fit:Infinity};
+            group.forEach(a => {
+                a.fit = getFitness(a.x, a.y);
+                if(a.fit < a.bestFit) { a.bestFit = a.fit; a.bestX = a.x; a.bestY = a.y; }
+                if(a.fit < gBest.fit) { gBest = {x: a.x, y: a.y, fit: a.fit}; }
+                if(a.fit < suoBest.fit) { suoBest = {x: a.x, y: a.y, fit: a.fit}; }
+            });
+
+            // Update positions
+            group.forEach(a => {
+                let r1 = Math.random(), r2 = Math.random();
+                
+                // Matematika SUO (Eksplorasi Global)
+                let fx = (a.bestX - a.x)*r1*0.05 + (gBest.x - a.x)*r2*0.1 + (suoBest.x - a.x)*Math.random()*0.02;
+                let fy = (a.bestY - a.y)*r1*0.05 + (gBest.y - a.y)*r2*0.1 + (suoBest.y - a.y)*Math.random()*0.02;
+                
+                a.vx = a.vx*0.8 + fx + (Math.random()-0.5)*0.01;
+                a.vy = a.vy*0.8 + fy + (Math.random()-0.5)*0.01;
+                
+                a.x += a.vx; a.y += a.vy;
+                a.x = Math.max(0, Math.min(1, a.x)); a.y = Math.max(0, Math.min(1, a.y));
+            });
+        });
+        suoIter++;
+    }
+
+    // --- VISUALISASI ---
+    function render() {
+        const kmaC = document.getElementById('kmaCanvas');
+        const kmaCtx = kmaC.getContext('2d');
+        kmaC.width = kmaC.parentElement.clientWidth; kmaC.height = kmaC.parentElement.clientHeight;
+        
+        const suoC = document.getElementById('suoCanvas');
+        const suoCtx = suoC.getContext('2d');
+        suoC.width = suoC.parentElement.clientWidth; suoC.height = suoC.parentElement.clientHeight;
+
+        kmaCtx.clearRect(0,0,kmaC.width, kmaC.height);
+        suoCtx.clearRect(0,0,suoC.width, suoC.height);
+
+        // Gambar KMA
+        komodos.forEach(k => {
+            kmaCtx.beginPath();
+            kmaCtx.arc(k.x * kmaC.width, k.y * kmaC.height, k.rank===0 ? 5 : (k.rank===1 ? 3 : 2), 0, Math.PI*2);
+            kmaCtx.fillStyle = k.rank===0 ? '#ef4444' : (k.rank===1 ? '#eab308' : '#60a5fa');
+            kmaCtx.fill();
+        });
+
+        // Gambar SUO
+        const colors = ['#06b6d4', '#8b5cf6', '#10b981', '#f97316', '#ec4899'];
+        suoGroups.forEach((group, i) => {
+            group.forEach(a => {
+                suoCtx.beginPath();
+                suoCtx.arc(a.x * suoC.width, a.y * suoC.height, 3, 0, Math.PI*2);
+                suoCtx.fillStyle = colors[i];
+                suoCtx.fill();
+            });
+        });
+
+        document.getElementById('kmaFitness').innerText = `Best: ${kmaBest.fit.toFixed(2)}`;
+        document.getElementById('kmaIter').innerText = kmaIter;
+        
+        document.getElementById('suoFitness').innerText = `Best: ${suoBest.fit.toFixed(2)}`;
+        document.getElementById('suoIter').innerText = suoIter;
+    }
+
+    let animId;
+    function run() {
+        if(kmaIter < 300) {
+            stepKMA();
+            stepSUO();
+            render();
+            animId = requestAnimationFrame(run);
+        }
+    }
+
+    document.getElementById('btnRestart').addEventListener('click', () => {
+        cancelAnimationFrame(animId);
+        drawLandscape('bgKma'); drawLandscape('bgSuo');
+        initKMA(); initSUO();
+        run();
+    });
+
+    // Init
+    window.addEventListener('resize', () => { drawLandscape('bgKma'); drawLandscape('bgSuo'); render(); });
+    setTimeout(() => { document.getElementById('btnRestart').click(); }, 500);
+
+</script>
+</body>
+</html>
