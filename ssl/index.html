@@ -79,7 +79,7 @@
                 </div>
 
                 <!-- Visualisasi Sinyal (Input) -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex-grow">
+                <div id="signal-container" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex-grow transition-all duration-500">
                     <h2 class="text-xl font-semibold mb-2">Sinyal EEG (Input)</h2>
                     <p class="text-xs text-slate-500 mb-3">Sinyal mentah tanpa label. SSL akan membuat pandangan kuat (strong) & lemah (weak) dari sinyal ini.</p>
                     
@@ -283,6 +283,22 @@
                 scatCtx.fill();
             });
             scatCtx.shadowBlur = 0; // reset
+
+            // Tambahkan petunjuk visual di scatter plot saat fase Augmentasi
+            if (simState === 'AUGMENT') {
+                scatCtx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                scatCtx.fillRect(w/2 - 175, h/2 - 35, 350, 70);
+                scatCtx.strokeStyle = '#334155';
+                scatCtx.lineWidth = 1;
+                scatCtx.strokeRect(w/2 - 175, h/2 - 35, 350, 70);
+                
+                scatCtx.fillStyle = '#94a3b8';
+                scatCtx.font = '14px "Segoe UI", Tahoma, sans-serif';
+                scatCtx.textAlign = 'center';
+                scatCtx.textBaseline = 'middle';
+                scatCtx.fillText('Model belum dilatih. Titik representasi belum bergerak.', w/2, h/2 - 12);
+                scatCtx.fillText('Klik tombol "2. Mulai Pre-Training" untuk melanjutkan.', w/2, h/2 + 12);
+            }
         }
 
         // --- GAME LOOP ---
@@ -308,6 +324,18 @@
             statusText.innerHTML = "<b>Augmentasi:</b> Sinyal mentah dimanipulasi (ditambah noise, digeser) untuk membuat Pasangan Positif. Neural network harus mengenali bahwa keduanya berasal dari sumber yang sama.";
             augmentLegend.classList.remove('hidden');
             
+            // Highlight panel sinyal agar pengguna tahu perubahannya ada di sini
+            const sigContainer = document.getElementById('signal-container');
+            if (sigContainer) {
+                sigContainer.classList.add('ring-4', 'ring-cyan-300', 'transform', 'scale-[1.02]');
+                setTimeout(() => {
+                    sigContainer.classList.remove('ring-4', 'ring-cyan-300', 'transform', 'scale-[1.02]');
+                }, 800);
+            }
+            
+            // Refresh ukuran canvas sedikit terlambat untuk mengimbangi animasi lebar kotak
+            setTimeout(resizeCanvas, 50);
+
             btnAugment.disabled = true;
             btnPretrain.disabled = false;
         });
