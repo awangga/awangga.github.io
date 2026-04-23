@@ -191,10 +191,10 @@
             const centerY = sigCanvas.height / 2;
             
             // Fungsi pembantu untuk menggambar gelombang
-            const drawWave = (offsetSpeed, amplitude, freq, color, lineDash = [], noise = 0) => {
+            const drawWave = (offsetSpeed, amplitude, freq, color, lineDash = [], noise = 0, customLineWidth = 2) => {
                 sigCtx.beginPath();
                 sigCtx.strokeStyle = color;
-                sigCtx.lineWidth = 2;
+                sigCtx.lineWidth = customLineWidth;
                 sigCtx.setLineDash(lineDash);
                 
                 for (let x = 0; x < sigCanvas.width; x++) {
@@ -215,14 +215,14 @@
                 // Sinyal asli tunggal
                 drawWave(2, 30, 0.05, '#94a3b8'); 
             } else if (simState === 'AUGMENT' || simState === 'PRETRAIN') {
-                // Tampilkan sinyal asli sebagai bayangan (transparan) di latar belakang
-                drawWave(2, 30, 0.05, 'rgba(148, 163, 184, 0.2)'); 
+                // Tampilkan sinyal asli sebagai bayangan (transparan) di latar belakang, dibuat lebih tebal (lebar 5)
+                drawWave(2, 30, 0.05, 'rgba(148, 163, 184, 0.35)', [], 0, 5); 
                 
                 // Tampilkan dua pandangan (Augmentasi)
                 // View 1 (Misal: Ditambah Noise)
-                drawWave(2, 30, 0.05, '#22d3ee', [], 10); 
+                drawWave(2, 30, 0.05, '#22d3ee', [], 10, 2); 
                 // View 2 (Misal: Ditambah sedikit pergeseran fase / Jitter)
-                drawWave(2.2, 25, 0.045, '#f472b6', [5, 5], 2); 
+                drawWave(2.2, 25, 0.045, '#f472b6', [5, 5], 2, 2); 
             }
             
             sigCtx.setLineDash([]); // reset
