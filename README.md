@@ -8,7 +8,7 @@ Konten:
 2. Federated Learning
 3. Self-Supervised Learning
 
-### Adaptive Learning
+## Adaptive Learning
 
 Sering juga disebut sebagai active learning atau human in the loop machine learning
 
