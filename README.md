@@ -18,7 +18,8 @@ Berhubungan dengan keamanan data, pemberlakukan pembobotan model yang valid deng
 
 ## Self-Supervised Learning
 
-* utamanya di augmentation policy
+* Utamanya di augmentation policy
+  Tepat, tapi khusus untuk metode tertentu (terutama di gambar/visi). Dalam metode SSL seperti Contrastive Learning (misal: SimCLR), augmentasi (seperti cropping, rotasi, ubah warna) adalah jantung utamanya. Tapi di data teks (NLP), SSL biasanya tidak pakai augmentasi seperti itu, melainkan teknik menyembunyikan kata (masking).
 * ada ukuran2 statistik
 * tetep harus ada labeling, sedikit aja
 * SSL , belajar memsupervisi sendiri
