@@ -4,6 +4,9 @@ Sebuah aplikasi web interaktif (simulasi) dalam satu file HTML yang menggabungka
 
 ## Contoh penggunakan kata bank
 
+<img width="1440" height="1800" alt="image" src="https://github.com/user-attachments/assets/44468880-a610-4afb-9741-519ef971ac44" />
+
+
 Pertanyaan yang sangat tajam! Anda baru saja menyentuh **alasan utama mengapa mekanisme *Self-Attention* pada Transformer itu sangat jenius.**
 
 Benar sekali, pemahaman pertama kita tentang kata "Bank" pastilah sebuah gedung tempat kita menyimpan uang. 
