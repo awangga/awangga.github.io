@@ -125,13 +125,13 @@
                 title: "1. Teks Masukan (Input)",
                 desc: `<p>Sebelum Transformer bisa melakukan apa-apa, kita butuh sebuah kalimat.</p>
                        <p>Mari kita gunakan kalimat: <strong>"Bank di sungai itu indah"</strong>.</p>
-                       <p>Komputer tidak memahami teks, jadi langkah pertama adalah memecah kalimat ini menjadi kata-kata (token).</p>`,
+                       <p>Langkah pertama adalah <strong>Tokenisasi</strong>. Komputer memecah kalimat dan mencari setiap kata di dalam "Kamus" raksasa miliknya untuk diberi ID unik berupa angka (misalnya: "Bank" = ID 843).</p>`,
                 animate: renderInput
             },
             {
                 title: "2. Input Embedding",
-                desc: `<p>Berdasarkan makalah (Bagian 3.4), model mengubah setiap token menjadi vektor (deretan angka) berdimensi <span class="math-text">d_model = 512</span>.</p>
-                       <p>Setiap angka ini merepresentasikan "makna" dari kata tersebut. Kata yang memiliki makna mirip akan memiliki angka yang mirip.</p>
+                desc: `<p>Berdasarkan makalah, model menukar ID tersebut menjadi vektor (deretan angka) berdimensi <span class="math-text">d_model = 512</span>.</p>
+                       <p><strong>Penting:</strong> Pada tahap ini, nilainya <strong>sepenuhnya independen (kaku)</strong>. Kata "Bank" selalu mendapat angka yang persis sama. Model masih "buta" dan belum tahu apakah ini "Bank Uang" atau "Bank Tepi Sungai".</p>
                        <p class="text-sm text-slate-400 mt-4 border-l-4 border-blue-500 pl-3">Dalam simulasi ini, kita tampilkan 3 angka saja sebagai contoh.</p>`,
                 animate: renderEmbedding
             },
@@ -153,9 +153,9 @@
             },
             {
                 title: "5. Scaled Dot-Product Attention",
-                desc: `<p>Bagaimana kata "Bank" tahu apakah ia berarti tempat uang atau tepi sungai?</p>
-                       <p><span class="text-pink-400">Query</span> dari "Bank" akan mencocokkan dirinya dengan <span class="text-yellow-400">Key</span> dari semua kata lain.</p>
-                       <p>Skor kecocokan tertinggi ada pada kata "sungai". Ini membuat model mengambil <span class="text-green-400">Value</span> dari "sungai" untuk memperjelas konteks "Bank".</p>
+                desc: `<p>Di sinilah Transformer memecahkan ambiguitas! Kata "Bank" bisa berarti gedung keuangan atau tepi sungai.</p>
+                       <p><span class="text-pink-400">Query</span> dari "Bank" mulai "bertanya" dan mencocokkan dirinya dengan <span class="text-yellow-400">Key</span> kata lain.</p>
+                       <p>Skor kecocokan tertinggi ternyata ada pada kata "sungai". Model lalu mengambil <span class="text-green-400">Value</span> dari "sungai" dan menyimpulkan: <em>"Aha! Ini pasti tepi sungai, BUKAN tempat uang!"</em></p>
                        <p class="text-xs bg-slate-800 p-2 rounded mt-2">Rumus: <span class="math-text">Attention(Q,K,V) = softmax(QK^T / √d_k)V</span></p>`,
                 animate: renderAttentionLines
             },
