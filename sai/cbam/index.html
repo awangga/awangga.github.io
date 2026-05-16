@@ -11,54 +11,88 @@
             --cbam-color: #fbbf24;
             --channel-color: #f87171;
             --spatial-color: #60a5fa;
-            --bg-dark: #0f172a;
+            --bg-dark: #0b0f1a;
         }
         body { background-color: var(--bg-dark); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
         
         .feature-map {
-            transition: all 0.5s ease;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
         .layer-box {
-            border: 2px solid rgba(255,255,255,0.1);
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
         }
-        .active-module {
-            border-color: var(--cbam-color);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-        }
-        @keyframes pulse-focus {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-        .focus-box { animation: pulse-focus 2s infinite; }
         
-        .step-inactive { opacity: 0.3; filter: grayscale(1); transform: scale(0.95); }
-        .step-active { opacity: 1; filter: grayscale(0); transform: scale(1); }
-
-        /* Custom 3D Slider logic */
-        .tensor-slice {
-            width: 40px; height: 40px;
-            background: rgba(251, 191, 36, 0.2);
-            border: 1px solid var(--cbam-color);
+        /* Animasi Pipeline Kiri */
+        .pipeline-step {
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .pipeline-active {
+            background: rgba(251, 191, 36, 0.1) !important;
+            border-color: var(--cbam-color) !important;
+            color: white !important;
+            transform: translateX(10px);
+            box-shadow: -5px 0 15px rgba(251, 191, 36, 0.2);
+        }
+        .pipeline-active::before {
+            content: '▶';
             position: absolute;
+            left: -15px;
+            color: var(--cbam-color);
+            font-size: 10px;
+        }
+
+        /* Tensor Slices (Tumpukan Kartu) */
+        .tensor-slice {
+            width: 120px;
+            height: 120px;
+            background: rgba(100, 116, 139, 0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: absolute;
+            transition: all 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .terminal-log {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+        .attention-dot {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(2px);
+            animation: pulse-dot 1.5s infinite;
         }
     </style>
 </head>
 <body class="text-slate-200 flex flex-col">
 
     <!-- Header -->
-    <header class="p-4 border-b border-slate-800 shrink-0 bg-slate-900/80">
+    <header class="p-4 border-b border-slate-800 shrink-0 bg-slate-900/90 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black text-white">CBAM <span class="text-amber-400">DEEP-DIVE</span></h1>
-                <p class="text-xs text-slate-400 font-mono italic">Mekanisme Atensi Spasial & Saluran pada ResNet-34</p>
+            <div class="flex items-center gap-4">
+                <div class="bg-amber-500 text-slate-900 font-black px-2 py-1 rounded text-xs">MODULE DIVE</div>
+                <div>
+                    <h1 class="text-xl font-black text-white">CBAM INTERNALS</h1>
+                    <p class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">ResNet-34 Feature Refinement Engine</p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="prevStep()" class="bg-slate-800 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-700">KEMBALI</button>
-                <button onclick="nextStep()" class="bg-amber-500 px-6 py-2 rounded-lg text-xs font-black text-slate-900 hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">LANJUTKAN PROSES</button>
+            <div class="flex gap-3">
+                <button onclick="prevStep()" class="bg-slate-800 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-700 transition-all border border-slate-700">KEMBALI</button>
+                <button onclick="nextStep()" class="bg-amber-500 px-8 py-2 rounded-full text-xs font-black text-slate-900 hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">LANJUTKAN ANALISIS</button>
             </div>
         </div>
     </header>
@@ -66,58 +100,67 @@
     <!-- Main Content -->
     <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-hidden">
         
-        <!-- KOLOM KIRI: STRUKTUR RESNET (PETA BESAR) -->
+        <!-- KOLOM KIRI: RESNET PIPELINE (Dibuat Aktif) -->
         <div class="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-hidden h-full">
-            <div class="layer-box rounded-2xl p-4 flex-1 flex flex-col overflow-hidden">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Pipeline ResNet-34</h3>
-                <div id="resnet-pipeline" class="flex-1 flex flex-col items-center justify-around py-4">
-                    <!-- Nodes generated by JS -->
+            <div class="layer-box rounded-3xl p-5 flex-1 flex flex-col overflow-hidden border-l-4 border-slate-700">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">ResNet-34 Execution Flow</h3>
+                <div id="resnet-pipeline" class="flex-1 flex flex-col items-center justify-around py-2">
+                    <!-- Dinamis via JS -->
                 </div>
-                <div class="mt-4 p-3 bg-black/40 rounded-xl border border-slate-800 text-[10px] text-slate-400 italic">
-                    CBAM disisipkan di setiap akhir blok Residual untuk menyaring fitur sebelum dikirim ke tahap berikutnya.
+                <div class="mt-6 p-4 bg-amber-500/5 rounded-2xl border border-amber-500/10 text-[11px] text-slate-400 leading-relaxed italic">
+                    "CBAM disisipkan setelah setiap blok konvolusi untuk melakukan kalibrasi fitur sebelum masuk ke lapisan Pooling."
                 </div>
             </div>
         </div>
 
-        <!-- KOLOM TENGAH: ANIMASI INTERNAL CBAM -->
+        <!-- KOLOM TENGAH: VISUALISASI TENSOR (Tumpukan Kartu) -->
         <div class="col-span-12 lg:col-span-6 flex flex-col gap-4 overflow-hidden h-full">
-            <div class="layer-box rounded-3xl p-6 flex-1 flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 id="step-title" class="text-lg font-black text-white uppercase italic tracking-tight">1. Input Feature Map</h2>
-                    <span id="step-count" class="text-xs font-mono text-amber-500">TAHAP [1 / 4]</span>
+            <div class="layer-box rounded-[2rem] p-8 flex-1 flex flex-col relative overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-from)_0%,_transparent_70%)] from-indigo-500/10">
+                <div class="flex justify-between items-start mb-8 z-10">
+                    <div>
+                        <h2 id="step-title" class="text-2xl font-black text-white uppercase tracking-tighter">1. Input Tensor</h2>
+                        <p id="step-subtitle" class="text-xs text-amber-500 font-mono mt-1 uppercase">Raw Convolutional Output</p>
+                    </div>
+                    <span id="step-count" class="bg-slate-800 px-3 py-1 rounded-full text-[10px] font-bold text-slate-400">STEP 01 / 04</span>
                 </div>
 
-                <!-- Canvas Visualisasi Utama -->
-                <div id="visual-area" class="flex-1 flex items-center justify-center relative perspective-[1000px]">
-                    
-                    <!-- Tensor Representasi -->
-                    <div id="tensor-container" class="relative w-64 h-64 feature-map">
-                        <!-- Slices generated by JS -->
+                <!-- Area Visualisasi 3D -->
+                <div id="visual-area" class="flex-1 flex items-center justify-center relative perspective-[1200px]">
+                    <div id="tensor-container" class="relative w-80 h-80 feature-map">
+                        <!-- Kartu-kartu (Channels) -->
                     </div>
 
-                    <!-- Overlay Keterangan Dinamis -->
-                    <div id="info-overlay" class="absolute bottom-4 left-4 right-4 bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl backdrop-blur-md">
-                        <p id="step-desc" class="text-sm text-amber-100 leading-relaxed font-medium">
-                            Data mentah masuk dari lapisan konvolusi ResNet-34 berupa tensor (H x W x C). Pada tahap ini, semua bagian gambar memiliki bobot yang sama.
+                    <!-- Label Penjelasan (Tumpukan Kartu) -->
+                    <div class="absolute top-0 right-0 text-[10px] text-slate-500 border-r border-t border-slate-800 p-2 text-right">
+                        <b class="text-slate-400">Struktur Data:</b><br>
+                        Tumpukan ini melambangkan<br>
+                        <span class="text-amber-500 font-mono">Height x Width x Channels</span><br>
+                        Setiap kartu adalah satu jenis fitur.
+                    </div>
+
+                    <!-- Info Box -->
+                    <div id="info-overlay" class="absolute bottom-0 left-0 right-0 bg-slate-900/90 border border-slate-800 p-6 rounded-3xl backdrop-blur-xl shadow-2xl translate-y-4">
+                        <p id="step-desc" class="text-sm text-slate-300 leading-relaxed">
+                            Memulai ekstraksi fitur... Data masuk sebagai tumpukan mentah. Semua bagian gambar dianggap penting secara statistik.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- KOLOM KANAN: METRIK & LOG DETAIL -->
+        <!-- KOLOM KANAN: LOG DETAIL (Diperbesar) -->
         <div class="col-span-12 lg:col-span-3 flex flex-col gap-4 overflow-hidden h-full">
-            <div class="layer-box rounded-2xl p-5 flex flex-col h-1/2 min-h-0 shadow-xl border-t-4 border-red-500">
-                <h3 class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-4">Channel Attention Log</h3>
-                <div id="channel-log" class="flex-1 overflow-y-auto font-mono text-[11px] text-red-200/70 space-y-2">
-                    <div class="opacity-30 italic">Menunggu aktivasi modul...</div>
+            <div class="layer-box rounded-3xl p-6 flex-1 flex flex-col min-h-0 border-t-4 border-red-500 shadow-2xl">
+                <h3 class="text-[11px] font-black text-red-500 uppercase tracking-widest mb-4">Channel (What) Log</h3>
+                <div id="channel-log" class="flex-1 overflow-y-auto terminal-log text-red-200/60 custom-scroll">
+                    <div class="opacity-20 italic">> Awaiting module activation...</div>
                 </div>
             </div>
 
-            <div class="layer-box rounded-2xl p-5 flex flex-col h-1/2 min-h-0 shadow-xl border-t-4 border-blue-500">
-                <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">Spatial Attention Log</h3>
-                <div id="spatial-log" class="flex-1 overflow-y-auto font-mono text-[11px] text-blue-200/70 space-y-2">
-                    <div class="opacity-30 italic">Menunggu aktivasi modul...</div>
+            <div class="layer-box rounded-3xl p-6 flex-1 flex flex-col min-h-0 border-t-4 border-blue-500 shadow-2xl mt-4">
+                <h3 class="text-[11px] font-black text-blue-500 uppercase tracking-widest mb-4">Spatial (Where) Log</h3>
+                <div id="spatial-log" class="flex-1 overflow-y-auto terminal-log text-blue-200/60 custom-scroll">
+                    <div class="opacity-20 italic">> Awaiting module activation...</div>
                 </div>
             </div>
         </div>
@@ -127,24 +170,32 @@
     <script>
         const steps = [
             {
-                title: "1. Input Feature Map",
-                desc: "Data mentah masuk dari lapisan konvolusi ResNet-34 berupa tensor (H x W x C). Pada tahap ini, semua bagian gambar memiliki bobot yang sama, termasuk latar belakang yang tidak relevan.",
-                color: "#64748b"
+                title: "1. Input Tensor",
+                subtitle: "Raw Feature Map (H x W x C)",
+                desc: "Data masuk sebagai tumpukan 'kartu' fitur. Pada tahap ini, model belum tahu fitur mana yang penting untuk diagnosa penyakit padi.",
+                color: "#64748b",
+                pipelineIdx: 2
             },
             {
-                title: "2. Channel Attention (What)",
-                desc: "AI bertanya: 'Fitur apa yang penting?' (Warna coklat? Tekstur garis?). Modul melakukan Global Avg Pooling dan Max Pooling untuk menekan saluran (channels) yang tidak berguna dan menonjolkan saluran yang berisi informasi gejala penyakit.",
-                color: "#f87171"
+                title: "2. Channel Attention",
+                subtitle: "Weighting 'WHAT' is important",
+                desc: "Sistem menimbang setiap kartu. Kartu yang menangkap 'Bintik Coklat' diperkuat, sedangkan kartu yang menangkap 'Tanah' atau 'Langit' dibuat transparan (ditekan).",
+                color: "#f87171",
+                pipelineIdx: 3
             },
             {
-                title: "3. Spatial Attention (Where)",
-                desc: "AI bertanya: 'Di mana lokasi fitur tersebut?' Modul membuat masker 2D untuk memfokuskan piksel pada area bintik/lesi daun dan mengabaikan area hijau sehat atau tanah di latar belakang.",
-                color: "#60a5fa"
+                title: "3. Spatial Attention",
+                subtitle: "Locating 'WHERE' the symptoms are",
+                desc: "Sistem membuat 'Masker'. Ia menandai lokasi koordinat piksel di mana gejala penyakit berada, memastikan AI tidak tertipu oleh gangguan di pinggir gambar.",
+                color: "#60a5fa",
+                pipelineIdx: 3
             },
             {
                 title: "4. Refined Output",
-                desc: "Hasil akhir adalah peta fitur yang sudah 'dibersihkan'. Piksel gejala penyakit sekarang memiliki nilai sinyal yang jauh lebih kuat, memudahkan sistem simbolik untuk melakukan klasifikasi dengan akurasi tinggi.",
-                color: "#fbbf24"
+                subtitle: "Calibrated Feature Representation",
+                desc: "Hasil akhir: Fitur yang tajam dan fokus. Data ini sekarang siap dikirim ke sistem simbolik untuk divalidasi berdasarkan aturan agronomi.",
+                color: "#fbbf24",
+                pipelineIdx: 4
             }
         ];
 
@@ -152,16 +203,18 @@
 
         function initResNetPipeline() {
             const container = document.getElementById('resnet-pipeline');
-            const layers = ["Conv1", "Layer 1 (3x)", "Layer 2 (4x)", "CBAM Module", "Layer 3 (6x)", "Layer 4 (3x)"];
+            const layers = ["Initial Conv7x7", "Residual Block 1-3", "Feature Extraction Stage", "CBAM MODULE (Attention)", "Global Average Pooling", "Softmax Classification"];
             
+            container.innerHTML = '';
             layers.forEach((l, i) => {
                 const div = document.createElement('div');
-                div.className = `w-full p-2 rounded border text-[9px] font-bold text-center transition-all duration-500 ${i === 3 ? 'bg-amber-500/20 border-amber-500 text-amber-400 active-module' : 'bg-slate-800/50 border-slate-700 text-slate-500'}`;
+                div.id = `pipe-step-${i}`;
+                div.className = `w-full p-3 rounded-xl border text-[10px] font-black text-center pipeline-step ${i === 3 ? 'border-amber-500/50 text-amber-500' : 'bg-slate-900/50 border-slate-800 text-slate-600'}`;
                 div.innerText = l;
                 container.appendChild(div);
                 if(i < layers.length - 1) {
                     const arrow = document.createElement('div');
-                    arrow.className = "text-slate-700 text-[10px]";
+                    arrow.className = "text-slate-800 text-[12px] my-1";
                     arrow.innerHTML = "↓";
                     container.appendChild(arrow);
                 }
@@ -171,86 +224,90 @@
         function createTensorSlices() {
             const container = document.getElementById('tensor-container');
             container.innerHTML = '';
-            const count = 8;
+            const count = 10;
             for(let i = 0; i < count; i++) {
                 const slice = document.createElement('div');
-                slice.className = 'tensor-slice transition-all duration-700';
-                slice.style.transform = `translateZ(${i * 20}px) rotateX(45deg) rotateZ(-45deg)`;
-                slice.style.left = `${i * 10}px`;
-                slice.style.top = `${i * 5}px`;
+                slice.className = 'tensor-slice';
+                // Posisi 3D Kartu
+                slice.style.transform = `translateZ(${i * 25}px) rotateX(60deg) rotateZ(-35deg)`;
+                slice.style.left = `${i * 12}px`;
+                slice.style.top = `${-i * 6}px`;
+                slice.id = `slice-${i}`;
                 container.appendChild(slice);
-            }
-        }
-
-        function nextStep() {
-            if(currentStep < steps.length - 1) {
-                currentStep++;
-                updateUI();
-            }
-        }
-
-        function prevStep() {
-            if(currentStep > 0) {
-                currentStep--;
-                updateUI();
             }
         }
 
         function updateUI() {
             const step = steps[currentStep];
             document.getElementById('step-title').innerText = step.title;
-            document.getElementById('step-count').innerText = `TAHAP [${currentStep + 1} / 4]`;
+            document.getElementById('step-subtitle').innerText = step.subtitle;
+            document.getElementById('step-count').innerText = `STEP 0${currentStep + 1} / 04`;
             document.getElementById('step-desc').innerText = step.desc;
             
+            // Update Pipeline Sidebar
+            document.querySelectorAll('.pipeline-step').forEach(s => s.classList.remove('pipeline-active'));
+            document.getElementById(`pipe-step-${step.pipelineIdx}`).classList.add('pipeline-active');
+
             const slices = document.querySelectorAll('.tensor-slice');
             const cLog = document.getElementById('channel-log');
             const sLog = document.getElementById('spatial-log');
 
-            // Reset logs visually if step 0
             if(currentStep === 0) {
-                cLog.innerHTML = '<div class="opacity-30 italic">Menunggu aktivasi modul...</div>';
-                sLog.innerHTML = '<div class="opacity-30 italic">Menunggu aktivasi modul...</div>';
+                cLog.innerHTML = '<div class="opacity-20 italic">> Awaiting module activation...</div>';
+                sLog.innerHTML = '<div class="opacity-20 italic">> Awaiting module activation...</div>';
                 slices.forEach(s => {
                     s.style.backgroundColor = 'rgba(100, 116, 139, 0.2)';
-                    s.style.borderColor = '#64748b';
-                    s.style.boxShadow = 'none';
+                    s.style.borderColor = 'rgba(255,255,255,0.2)';
+                    s.style.opacity = '1';
+                    s.innerHTML = '';
                 });
             }
 
             if(currentStep === 1) { // Channel Attention
                 slices.forEach((s, i) => {
-                    // Berikan intensitas berbeda pada tiap slice (channel)
-                    const intensity = Math.random() > 0.5 ? 0.8 : 0.1;
-                    s.style.backgroundColor = `rgba(248, 113, 113, ${intensity})`;
-                    s.style.borderColor = '#f87171';
+                    // Mensimulasikan bobot channel (What)
+                    const isImportant = [2, 5, 8].includes(i);
+                    s.style.backgroundColor = isImportant ? 'rgba(248, 113, 113, 0.8)' : 'rgba(248, 113, 113, 0.05)';
+                    s.style.borderColor = isImportant ? '#f87171' : 'rgba(248, 113, 113, 0.1)';
+                    s.style.transform += ' scale(1.05)';
                 });
-                cLog.innerHTML += `<div class="text-red-400">> GlobalAvgPool: Computing channel stats...</div>`;
-                cLog.innerHTML += `<div class="text-red-400">> MLP: Recalibrating channel weights...</div>`;
-                cLog.innerHTML += `<div class="text-white font-bold">> Success: Highlighting 'Brown_Texture' channel.</div>`;
+                cLog.innerHTML = `<div class="text-red-400">> GlobalAvgPool: Analyzing 512 channels...</div>`;
+                cLog.innerHTML += `<div class="text-red-400">> FC Layer: Exciting 'Brown_Spot' features...</div>`;
+                cLog.innerHTML += `<div class="text-white font-bold">> Result: Channels 2, 5, 8 prioritized.</div>`;
             }
 
             if(currentStep === 2) { // Spatial Attention
-                slices.forEach(s => {
-                    s.style.backgroundColor = 'rgba(96, 165, 250, 0.3)';
-                    s.style.borderColor = '#60a5fa';
-                    // Tambahkan titik fokus visual (masker)
-                    s.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><div class="w-4 h-4 bg-white/40 rounded-full blur-sm animate-pulse"></div></div>';
+                slices.forEach((s, i) => {
+                    const isImportant = [2, 5, 8].includes(i);
+                    if(isImportant) {
+                        s.style.backgroundColor = 'rgba(96, 165, 250, 0.6)';
+                        s.style.borderColor = '#60a5fa';
+                        s.innerHTML = '<div class="attention-dot"></div>';
+                    }
                 });
-                sLog.innerHTML += `<div class="text-blue-400">> Concat(Avg, Max): Generating spatial map...</div>`;
-                sLog.innerHTML += `<div class="text-blue-400">> Conv7x7: Localizing disease lesion...</div>`;
-                sLog.innerHTML += `<div class="text-white font-bold">> Mask Applied: Focusing on central necrosis.</div>`;
+                sLog.innerHTML = `<div class="text-blue-400">> Concatenating Avg & Max pools...</div>`;
+                sLog.innerHTML += `<div class="text-blue-400">> Conv7x7: Generating spatial mask...</div>`;
+                sLog.innerHTML += `<div class="text-white font-bold">> Result: Focusing on central leaf lesions.</div>`;
             }
 
             if(currentStep === 3) { // Final Output
-                slices.forEach(s => {
-                    s.style.backgroundColor = 'rgba(251, 191, 36, 0.5)';
-                    s.style.borderColor = '#fbbf24';
-                    s.style.boxShadow = '0 0 15px rgba(251, 191, 36, 0.4)';
+                slices.forEach((s, i) => {
+                    const isImportant = [2, 5, 8].includes(i);
+                    if(isImportant) {
+                        s.style.backgroundColor = 'rgba(251, 191, 36, 0.7)';
+                        s.style.borderColor = '#fbbf24';
+                        s.style.boxShadow = '0 0 30px rgba(251, 191, 36, 0.4)';
+                        s.style.transform += ' translateZ(50px)';
+                    } else {
+                        s.style.opacity = '0';
+                    }
                 });
-                document.getElementById('step-title').classList.add('animate-bounce');
-                setTimeout(() => document.getElementById('step-title').classList.remove('animate-bounce'), 1000);
+                document.getElementById('step-title').style.color = '#fbbf24';
             }
         }
+
+        function nextStep() { if(currentStep < steps.length - 1) { currentStep++; updateUI(); } }
+        function prevStep() { if(currentStep > 0) { currentStep--; updateUI(); } }
 
         window.onload = () => {
             initResNetPipeline();
