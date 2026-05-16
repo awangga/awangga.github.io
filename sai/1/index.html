@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksplorasi Detil AI Neuro-Simbolik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --neural-color: #10b981;
+            --symbolic-color: #6366f1;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        .node-active {
+            fill: var(--neural-color);
+            filter: drop-shadow(0 0 5px var(--neural-color));
+        }
+        .edge-flow {
+            stroke-dasharray: 5;
+            animation: flow-dash 2s linear infinite;
+        }
+        @keyframes flow-dash {
+            to { stroke-dashoffset: -20; }
+        }
+        .logic-node {
+            transition: all 0.3s;
+        }
+        .logic-active {
+            fill: var(--symbolic-color);
+            stroke: white;
+            stroke-width: 2px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .step-label {
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans">
+
+    <!-- Hero Section -->
+    <header class="bg-indigo-900 text-white py-16 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <svg width="100%" height="100%"><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern><rect width="100%" height="100%" fill="url(#grid)" /></svg>
+        </div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h1 class="text-5xl font-extrabold mb-6 tracking-tight">Neuro-Symbolic AI</h1>
+            <p class="text-xl text-indigo-100 leading-relaxed">
+                Menggabungkan kekuatan <span class="text-emerald-400 font-mono italic">Deep Learning</span> untuk persepsi 
+                dengan ketajaman <span class="text-indigo-400 font-mono italic">Formal Logic</span> untuk penalaran.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto -mt-10 p-6 space-y-10">
+        
+        <!-- Top Comparison Row -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-2xl shadow-xl">
+                <div class="text-emerald-600 mb-2 font-bold flex items-center">
+                    <span class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></span> System 1: Persepsi
+                </div>
+                <h3 class="text-lg font-bold mb-2">Neural Network</h3>
+                <p class="text-sm text-slate-600">Ekstraksi fitur otomatis dari data mentah. Menemukan "apa" yang ada di gambar tanpa tahu "mengapa".</p>
+            </div>
+            <div class="bg-indigo-600 p-6 rounded-2xl shadow-xl text-white flex flex-col justify-center">
+                <h3 class="text-lg font-bold mb-2">The Bridge: Grounding</h3>
+                <p class="text-sm opacity-90 italic">"Menghubungkan probabilitas statistik ke dalam simbol logika yang bermakna bagi manusia."</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl shadow-xl">
+                <div class="text-indigo-600 mb-2 font-bold flex items-center">
+                    <span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span> System 2: Penalaran
+                </div>
+                <h3 class="text-lg font-bold mb-2">Symbolic Logic</h3>
+                <p class="text-sm text-slate-600">Menggunakan aturan pakar (Knowledge Graph) untuk memvalidasi apakah persepsi tersebut masuk akal.</p>
+            </div>
+        </div>
+
+        <!-- DETAILED ARCHITECTURE VISUALIZER -->
+        <section class="glass-card rounded-3xl shadow-2xl overflow-hidden border border-white">
+            <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Visualisator Arsitektur Detil</h2>
+                    <p class="text-sm text-slate-500 italic">Berdasarkan framework "ResNet-34 + CBAM + RDF Validator"</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="changeSample('blast')" class="px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 text-sm font-bold hover:bg-indigo-200">Sampel: Blast</button>
+                    <button onclick="changeSample('tungro')" class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-bold hover:bg-emerald-200">Sampel: Tungro</button>
+                </div>
+            </div>
+
+            <div class="p-8 grid lg:grid-cols-4 gap-4 items-center min-h-[500px]">
+                
+                <!-- 1. Input Layer -->
+                <div class="flex flex-col items-center">
+                    <span class="step-label text-slate-400 mb-4 italic">Input Padi</span>
+                    <div id="input-leaf" class="w-40 h-40 rounded-2xl border-4 border-white shadow-lg overflow-hidden flex items-center justify-center bg-white">
+                        <span id="leaf-emoji" class="text-7xl transition-all duration-500">🍂</span>
+                    </div>
+                    <div class="mt-4 text-xs font-mono bg-slate-200 p-2 rounded text-slate-500">Piksel: [256 x 256 x 3]</div>
+                </div>
+
+                <!-- 2. Neural Network (Deep Detail) -->
+                <div class="bg-emerald-50/50 p-4 rounded-3xl border border-emerald-100 relative h-full">
+                    <span class="step-label text-emerald-600 block text-center mb-6">Neural Engine (Persepsi)</span>
+                    <svg id="deep-neural-svg" viewBox="0 0 200 300" class="w-full h-64">
+                        <!-- SVG content generated by JS for better control -->
+                    </svg>
+                    <div class="mt-4">
+                        <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                            <div id="neural-progress" class="h-full bg-emerald-500 w-0 transition-all duration-1000"></div>
+                        </div>
+                        <p id="neural-status" class="text-[10px] text-emerald-700 mt-2 font-mono uppercase tracking-tighter">Standby...</p>
+                    </div>
+                </div>
+
+                <!-- 3. Symbolic Logic (Knowledge Graph) -->
+                <div class="bg-indigo-50/50 p-4 rounded-3xl border border-indigo-100 relative h-full">
+                    <span class="step-label text-indigo-600 block text-center mb-6">Symbolic Engine (Penalaran)</span>
+                    <svg id="knowledge-graph-svg" viewBox="0 0 200 300" class="w-full h-64">
+                        <!-- KG generated by JS -->
+                    </svg>
+                    <div id="logic-steps" class="absolute inset-0 flex flex-col justify-center px-6 pointer-events-none opacity-0 transition-opacity duration-500">
+                        <div class="bg-white/90 p-3 rounded-lg shadow-sm text-[10px] space-y-1 border-l-4 border-indigo-500">
+                            <div id="rule-1">...</div>
+                            <div id="rule-2">...</div>
+                            <div id="rule-3" class="font-bold">...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Result Audit -->
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <span class="step-label text-slate-400">Diagnosis Final</span>
+                    <div id="final-box" class="w-full p-6 rounded-2xl bg-white shadow-xl border-t-8 border-slate-300 transform transition-all duration-500 scale-90 opacity-50">
+                        <div class="text-xs text-slate-400 font-bold uppercase mb-1">Status Audit</div>
+                        <div id="audit-status" class="text-xs font-mono mb-3">WAITING...</div>
+                        <div id="disease-name" class="text-xl font-black text-slate-800">--</div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase">Confidence</span>
+                            <span id="conf-val" class="text-sm font-mono font-bold text-indigo-600">0%</span>
+                        </div>
+                    </div>
+                    <button onclick="startInference()" id="btn-run" class="w-full bg-slate-800 text-white py-4 rounded-xl font-black tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg">
+                        JALANKAN AI
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Technical Deep Dive -->
+        <section class="grid md:grid-cols-2 gap-10">
+            <div class="space-y-4">
+                <h3 class="text-2xl font-bold border-l-4 border-emerald-500 pl-4">Cara Kerja Neural (System 1)</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Bagian ini menggunakan **ResNet-34** dengan tambahan **CBAM (Convolutional Block Attention Module)**. 
+                    Alih-alih melihat seluruh gambar, AI "memberi perhatian" lebih pada area bintik atau lesi. 
+                    Outputnya bukan langsung diagnosa, melainkan probabilitas keberadaan *symptom* (gejala) visual.
+                </p>
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-xs font-mono text-emerald-800">
+                    Symptom_Vector = [Bintik: 0.92, Kuning: 0.85, Garis: 0.02]
+                </div>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-2xl font-bold border-l-4 border-indigo-500 pl-4">Cara Kerja Simbolik (System 2)</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Menggunakan bahasa **RDF/OWL** atau aturan **Horn Clause**. Sistem mengecek: "Jika Neural mendeteksi bintik coklat DAN aturan agronomi mengatakan bintik coklat adalah ciri khas Blast, maka hasil diagnosa terverifikasi (Aligned)."
+                </p>
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-xs font-mono text-indigo-800">
+                    Rule: Disease(?d) ^ hasSymptom(?d, ?s) ^ detected(?s) -> Diagnosis(?d)
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-12 text-slate-400 text-sm italic">
+        "Trustworthy AI: Bukan hanya akurat, tapi juga punya alasan logis."
+    </footer>
+
+    <script>
+        // Data Sampel
+        const samples = {
+            blast: { emoji: "🍂", perception: "Bintik Elips Terdeteksi", symptoms: ["elips", "pusat_abu"], rules: ["IF bintik_elips", "AND pusat_abu-abu", "THEN Blast Disease"], diagnosis: "RICE BLAST", conf: "95.1%", status: "ALIGNED", color: "#6366f1" },
+            tungro: { emoji: "🌿", perception: "Daun Menguning Oranye", symptoms: ["kuning", "kerdil"], rules: ["IF warna_oranye", "AND tanaman_kerdil", "THEN Tungro Virus"], diagnosis: "TUNGRO VIRUS", conf: "89.4%", status: "ALIGNED", color: "#f59e0b" }
+        };
+
+        let activeSample = 'blast';
+
+        function initArchitecture() {
+            const neuralSvg = document.getElementById('deep-neural-svg');
+            const kgSvg = document.getElementById('knowledge-graph-svg');
+            
+            // Create Neural Nodes
+            const layers = [4, 6, 6, 3];
+            layers.forEach((count, lIndex) => {
+                const x = 30 + (lIndex * 45);
+                for(let i=0; i<count; i++) {
+                    const y = (150 - (count * 20) / 2) + (i * 20);
+                    // Lines to next layer
+                    if(lIndex < layers.length - 1) {
+                        for(let nextI=0; nextI<layers[lIndex+1]; nextI++) {
+                            const nextY = (150 - (layers[lIndex+1] * 20) / 2) + (nextI * 20);
+                            const line = createSVG('line', { x1: x, y1: y, x2: x+45, y2: nextY, stroke: '#e2e8f0', 'stroke-width': 0.5 });
+                            neuralSvg.appendChild(line);
+                        }
+                    }
+                    const circle = createSVG('circle', { cx: x, cy: y, r: 4, fill: '#cbd5e1', class: 'neural-node' });
+                    neuralSvg.appendChild(circle);
+                }
+            });
+
+            // Create KG Nodes
+            const kgNodes = [
+                {x: 100, y: 50, label: 'DISEASE'},
+                {x: 50, y: 150, label: 'SYMPTOMS'}, {x: 150, y: 150, label: 'CAUSES'},
+                {x: 30, y: 250, label: 'COLOR'}, {x: 70, y: 250, label: 'SHAPE'}
+            ];
+            kgNodes.forEach(n => {
+                const circle = createSVG('circle', { cx: n.x, cy: n.y, r: 8, fill: '#e2e8f0', class: 'logic-node' });
+                kgSvg.appendChild(circle);
+                // Simple labels
+                const txt = createSVG('text', { x: n.x, y: n.y + 20, 'font-size': '8px', 'text-anchor': 'middle', fill: '#94a3b8' });
+                txt.textContent = n.label;
+                kgSvg.appendChild(txt);
+            });
+        }
+
+        function createSVG(tag, attrs) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+            for (let k in attrs) el.setAttribute(k, attrs[k]);
+            return el;
+        }
+
+        function changeSample(key) {
+            activeSample = key;
+            document.getElementById('leaf-emoji').innerText = samples[key].emoji;
+            resetUI();
+        }
+
+        function resetUI() {
+            document.getElementById('final-box').classList.add('opacity-50', 'scale-90');
+            document.getElementById('neural-progress').style.width = '0%';
+            document.querySelectorAll('.neural-node').forEach(n => n.setAttribute('fill', '#cbd5e1'));
+            document.querySelectorAll('.logic-node').forEach(n => n.classList.remove('logic-active'));
+            document.getElementById('logic-steps').classList.add('opacity-0');
+            document.getElementById('neural-status').innerText = "Standby...";
+        }
+
+        function startInference() {
+            const data = samples[activeSample];
+            const btn = document.getElementById('btn-run');
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+            resetUI();
+
+            // Step 1: Neural Perception
+            setTimeout(() => {
+                document.getElementById('neural-status').innerText = "Ekstraksi Fitur (ResNet-34)...";
+                document.getElementById('neural-progress').style.width = '100%';
+                document.querySelectorAll('.neural-node').forEach((n, i) => {
+                    setTimeout(() => n.setAttribute('fill', '#10b981'), i * 20);
+                });
+
+                // Step 2: Bridge/Grounding
+                setTimeout(() => {
+                    document.getElementById('neural-status').innerText = `FITUR: ${data.perception}`;
+                    
+                    // Step 3: Symbolic Reasoning
+                    setTimeout(() => {
+                        document.getElementById('logic-steps').classList.remove('opacity-0');
+                        document.getElementById('rule-1').innerText = data.rules[0];
+                        document.getElementById('rule-2').innerText = data.rules[1];
+                        document.getElementById('rule-3').innerText = data.rules[2];
+                        
+                        document.querySelectorAll('.logic-node').forEach((n, i) => {
+                            setTimeout(() => n.classList.add('logic-active'), i * 100);
+                        });
+
+                        // Final: Audit Result
+                        setTimeout(() => {
+                            const finalBox = document.getElementById('final-box');
+                            document.getElementById('audit-status').innerText = `SUCCESS: ${data.status}`;
+                            document.getElementById('audit-status').style.color = '#059669';
+                            document.getElementById('disease-name').innerText = data.diagnosis;
+                            document.getElementById('conf-val').innerText = data.conf;
+                            
+                            finalBox.style.borderColor = data.color;
+                            finalBox.classList.remove('opacity-50', 'scale-90');
+                            finalBox.classList.add('opacity-100', 'scale-100');
+                            
+                            btn.disabled = false;
+                            btn.innerText = "JALANKAN ULANG";
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 500);
+        }
+
+        window.onload = initArchitecture;
+    </script>
+</body>
+</html>
