@@ -36,12 +36,15 @@
             border: 2px solid #fbbf24;
             box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
         }
-        .node-flash {
-            animation: flash 0.5s ease-out;
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
         }
-        @keyframes flash {
-            0% { filter: brightness(2); transform: scale(1.5); }
-            100% { filter: brightness(1); transform: scale(1); }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
         }
     </style>
 </head>
@@ -54,8 +57,8 @@
                 <p class="text-slate-400 text-sm italic">Integrasi ResNet-34 (Persepsi) & Knowledge Graph (Audit Logika)</p>
             </div>
             <div class="flex gap-4">
-                <button onclick="runPipeline('brown_spot')" class="px-4 py-2 rounded bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-600/40 transition-all text-sm font-bold">UJI BROWN SPOT</button>
-                <button onclick="runPipeline('bacterial_streak')" class="px-4 py-2 rounded bg-indigo-600/20 border border-indigo-500/50 text-indigo-400 hover:bg-indigo-600/40 transition-all text-sm font-bold">UJI BACTERIAL STREAK</button>
+                <button onclick="runPipeline('brown_spot')" class="px-6 py-3 rounded-full bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-600/40 transition-all text-sm font-bold shadow-lg shadow-emerald-500/10">UJI BROWN SPOT</button>
+                <button onclick="runPipeline('bacterial_streak')" class="px-6 py-3 rounded-full bg-indigo-600/20 border border-indigo-500/50 text-indigo-400 hover:bg-indigo-600/40 transition-all text-sm font-bold shadow-lg shadow-indigo-500/10">UJI BACTERIAL STREAK</button>
             </div>
         </div>
     </header>
@@ -71,12 +74,13 @@
                 </div>
                 <div class="aspect-square bg-black rounded-xl border border-slate-700 flex items-center justify-center relative">
                     <div id="image-container" class="text-8xl transition-all duration-500">🌿</div>
+                    <!-- CBAM Overlay -->
                     <div id="cbam-overlay" class="absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none flex items-center justify-center">
                         <div class="cbam-box w-24 h-24 rounded-lg animate-pulse"></div>
                     </div>
                 </div>
-                <div class="mt-4 terminal-text text-emerald-500 bg-black/40 p-3 rounded h-16 overflow-hidden">
-                    <div id="neural-log" class="animate-pulse">> Awaiting signal...</div>
+                <div class="mt-4 terminal-text text-emerald-500 bg-black/40 p-3 rounded h-20 flex flex-col justify-center">
+                    <div id="neural-log" class="leading-relaxed">> Awaiting input signal...</div>
                 </div>
             </div>
 
@@ -114,7 +118,7 @@
                     </svg>
                 </div>
 
-                <div class="terminal-text text-indigo-300 bg-indigo-900/20 p-4 border-l-4 border-indigo-500 rounded mt-4">
+                <div class="terminal-text text-indigo-300 bg-indigo-900/20 p-4 border-l-4 border-indigo-500 rounded mt-4 h-24 overflow-hidden">
                     <div class="font-bold mb-1 underline">REASONER LOG:</div>
                     <div id="symbolic-log">IDLE: Menunggu bukti dari sistem neural...</div>
                 </div>
@@ -126,8 +130,8 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 h-full flex flex-col">
                 <h3 class="text-xs font-bold text-slate-500 uppercase mb-6 text-center">Hasil Audit & Triage</h3>
                 
-                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-6 opacity-40 grayscale transition-all duration-700 scale-95">
-                    <div id="audit-icon" class="w-20 h-20 rounded-full flex items-center justify-center bg-slate-800 text-3xl">?</div>
+                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-6 opacity-40 grayscale transition-all duration-1000 scale-95">
+                    <div id="audit-icon" class="w-20 h-20 rounded-full flex items-center justify-center bg-slate-800 text-3xl transition-colors duration-500">?</div>
                     <div>
                         <div id="audit-status" class="text-xs font-black tracking-widest text-slate-500 mb-2 uppercase">STATUS: PENDING</div>
                         <h2 id="final-diagnosis" class="text-2xl font-black text-white">--</h2>
@@ -144,7 +148,7 @@
                     </div>
 
                     <div class="bg-slate-800/50 p-4 rounded-xl w-full border border-slate-700">
-                        <p id="rationale-text" class="text-[10px] text-slate-400 italic">"Gunakan tombol di atas untuk memulai simulasi diagnosis."</p>
+                        <p id="rationale-text" class="text-[10px] text-slate-400 italic">"Pilih sampel untuk memulai diagnosa mendalam."</p>
                     </div>
                 </div>
 
@@ -170,7 +174,7 @@
                 status: "ALIGNED", 
                 targetNode: "node-symptom-a",
                 path: "path-a",
-                rationale: "Model neural mendeteksi lesi coklat (97%) yang sesuai dengan aturan Knowledge Base nomor 12."
+                rationale: "Model neural mendeteksi lesi coklat (97.13%) yang dikonfirmasi oleh aturan nomor 12 di Knowledge Base agronomi."
             },
             bacterial_streak: { 
                 emoji: "🌾", 
@@ -181,19 +185,16 @@
                 status: "ALIGNED", 
                 targetNode: "node-symptom-b",
                 path: "path-b",
-                rationale: "Garis putih linear terdeteksi. Sistem simbolik memvalidasi ini sebagai infeksi X.oryzae."
+                rationale: "Garis putih linear terdeteksi. Sistem simbolik memvalidasi ini sebagai infeksi bakteri X.oryzae berdasarkan struktur lesi."
             }
         };
 
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
         function initNeural() {
-            const svg = document.getElementById('neural-svg');
-            const svgHeight = 150; // Sesuai viewBox 0 0 300 150
-            
+            const svgHeight = 150;
             const drawLayer = (x, count, id) => {
                 const group = document.getElementById(id);
-                // Perbaikan perhitungan Y agar selalu di tengah
                 const spacing = 18; 
                 const totalHeight = (count - 1) * spacing;
                 const startY = (svgHeight - totalHeight) / 2;
@@ -205,7 +206,7 @@
                     circle.setAttribute("cy", y);
                     circle.setAttribute("r", 4);
                     circle.setAttribute("fill", "#1e293b");
-                    circle.setAttribute("class", "n-node transition-all duration-300");
+                    circle.setAttribute("class", "n-node transition-all duration-500");
                     group.appendChild(circle);
                     
                     if (id !== 'n-layer-3') {
@@ -222,7 +223,7 @@
                             line.setAttribute("x2", nextX);
                             line.setAttribute("y2", ny);
                             line.setAttribute("class", "neural-line transition-all");
-                            svg.insertBefore(line, group);
+                            document.getElementById('neural-svg').insertBefore(line, group);
                         }
                     }
                 }
@@ -239,6 +240,7 @@
             const triage = document.getElementById('triage-card');
             const statusTag = document.getElementById('status-tag');
             
+            // RESET
             statusTag.innerText = "STATUS: BUSY";
             statusTag.className = "px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-mono";
             triage.classList.add('grayscale', 'opacity-40', 'scale-95');
@@ -250,38 +252,43 @@
             });
             document.querySelectorAll('#kg-svg path').forEach(p => p.setAttribute('stroke', '#1e293b'));
 
+            // TAHAP 1: INPUT SCAN (1.5 detik)
             document.getElementById('image-container').innerText = data.emoji;
-            nLog.innerText = "> Loading image tensor...";
-            await sleep(800);
+            nLog.innerHTML = `> <span class="loading-dots">Mengunggah tensor gambar</span>`;
+            await sleep(1500);
 
-            nLog.innerText = "> ResNet-34 Feature Extraction...";
+            // TAHAP 2: NEURAL EXTRACTION (2.5 detik)
+            nLog.innerHTML = `> <span class="loading-dots">Ekstraksi fitur ResNet-34</span>`;
             document.querySelectorAll('#n-layer-1 circle').forEach((c, i) => {
-                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 50);
+                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 150);
             });
-            await sleep(1000);
+            await sleep(2500);
             
+            // TAHAP 3: CBAM ATTENTION (2.5 detik)
             document.getElementById('cbam-overlay').classList.remove('opacity-0');
-            nLog.innerText = "> CBAM Attention: Focusing on lesion margins...";
+            nLog.innerHTML = `> <span class="loading-dots">CBAM Attention: Mencari bintik lesi</span>`;
             document.querySelectorAll('#n-layer-2 circle').forEach((c, i) => {
-                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 50);
+                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 150);
             });
-            await sleep(1200);
+            await sleep(2500);
             
-            nLog.innerHTML = `> PERSEPSI: <span class="text-white">${data.perception}</span>`;
+            nLog.innerHTML = `> <span class="text-white font-bold">PERSEPSI: ${data.perception}</span>`;
             document.querySelectorAll('#n-layer-3 circle').forEach(c => c.setAttribute('fill', '#fbbf24'));
 
-            sLog.innerText = "> Bukti diterima. Menelusuri Knowledge Graph...";
-            await sleep(1000);
+            // TAHAP 4: SYMBOLIC REASONING (3 detik)
+            sLog.innerHTML = `> Bukti diterima.<br><span class="loading-dots">Menelusuri Knowledge Graph pakar</span>`;
+            await sleep(2000);
             
             document.getElementById(data.targetNode).classList.add('active-logic');
-            sLog.innerText = `> LOGIKA: ${data.rules}...`;
-            await sleep(800);
+            sLog.innerHTML = `> Menemukan Simbol Gejala...<br>> <span class="text-indigo-400">LOGIKA: ${data.rules}</span>`;
+            await sleep(1500);
             
             document.getElementById(data.path).setAttribute('stroke', '#6366f1');
             document.getElementById('node-disease').classList.add('active-logic');
-            sLog.innerHTML = `> <span class="text-emerald-400">SUCCESS: Rule Aligned with expert priors.</span>`;
+            sLog.innerHTML += `<br>> <span class="text-emerald-400 font-bold">SUCCESS: Rule Aligned.</span>`;
 
-            await sleep(800);
+            // TAHAP 5: FINAL AUDIT (2 detik)
+            await sleep(1500);
             statusTag.innerText = "STATUS: LIVE";
             statusTag.className = "px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-mono";
             
