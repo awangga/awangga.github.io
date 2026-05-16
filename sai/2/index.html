@@ -82,7 +82,7 @@
 
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                 <h3 class="text-xs font-bold text-slate-500 uppercase mb-4 text-center">Neural Feature Map (ResNet-34)</h3>
-                <svg id="neural-svg" viewBox="0 0 300 150" class="w-full">
+                <svg id="neural-svg" viewBox="0 0 300 150" class="w-full h-48">
                     <g id="n-layer-1"></g>
                     <g id="n-layer-2"></g>
                     <g id="n-layer-3"></g>
@@ -185,15 +185,21 @@
             }
         };
 
-        // Perbaikan fungsi sleep: setTimeout(callback, delay)
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
         function initNeural() {
             const svg = document.getElementById('neural-svg');
+            const svgHeight = 150; // Sesuai viewBox 0 0 300 150
+            
             const drawLayer = (x, count, id) => {
                 const group = document.getElementById(id);
+                // Perbaikan perhitungan Y agar selalu di tengah
+                const spacing = 18; 
+                const totalHeight = (count - 1) * spacing;
+                const startY = (svgHeight - totalHeight) / 2;
+
                 for(let i=0; i<count; i++) {
-                    const y = (150 - (count * 20) / 2) + (i * 20);
+                    const y = startY + (i * spacing);
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                     circle.setAttribute("cx", x);
                     circle.setAttribute("cy", y);
@@ -205,8 +211,11 @@
                     if (id !== 'n-layer-3') {
                         const nextCount = id === 'n-layer-1' ? 6 : 3;
                         const nextX = x + 100;
+                        const nextTotalHeight = (nextCount - 1) * spacing;
+                        const nextStartY = (svgHeight - nextTotalHeight) / 2;
+
                         for(let j=0; j<nextCount; j++) {
-                            const ny = (150 - (nextCount * 20) / 2) + (j * 20);
+                            const ny = nextStartY + (j * spacing);
                             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                             line.setAttribute("x1", x);
                             line.setAttribute("y1", y);
@@ -230,7 +239,6 @@
             const triage = document.getElementById('triage-card');
             const statusTag = document.getElementById('status-tag');
             
-            // Reset UI
             statusTag.innerText = "STATUS: BUSY";
             statusTag.className = "px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-mono";
             triage.classList.add('grayscale', 'opacity-40', 'scale-95');
@@ -242,19 +250,16 @@
             });
             document.querySelectorAll('#kg-svg path').forEach(p => p.setAttribute('stroke', '#1e293b'));
 
-            // Step 1: Input Scan
             document.getElementById('image-container').innerText = data.emoji;
             nLog.innerText = "> Loading image tensor...";
             await sleep(800);
 
-            // Step 2: Neural Processing (Persepsi)
             nLog.innerText = "> ResNet-34 Feature Extraction...";
             document.querySelectorAll('#n-layer-1 circle').forEach((c, i) => {
                 setTimeout(() => c.setAttribute('fill', '#10b981'), i * 50);
             });
             await sleep(1000);
             
-            // CBAM Attention
             document.getElementById('cbam-overlay').classList.remove('opacity-0');
             nLog.innerText = "> CBAM Attention: Focusing on lesion margins...";
             document.querySelectorAll('#n-layer-2 circle').forEach((c, i) => {
@@ -265,7 +270,6 @@
             nLog.innerHTML = `> PERSEPSI: <span class="text-white">${data.perception}</span>`;
             document.querySelectorAll('#n-layer-3 circle').forEach(c => c.setAttribute('fill', '#fbbf24'));
 
-            // Step 3: Grounding to Symbolic
             sLog.innerText = "> Bukti diterima. Menelusuri Knowledge Graph...";
             await sleep(1000);
             
@@ -277,7 +281,6 @@
             document.getElementById('node-disease').classList.add('active-logic');
             sLog.innerHTML = `> <span class="text-emerald-400">SUCCESS: Rule Aligned with expert priors.</span>`;
 
-            // Step 4: Final Triage
             await sleep(800);
             statusTag.innerText = "STATUS: LIVE";
             statusTag.className = "px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-mono";
