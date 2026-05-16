@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Arsitektur Neuro-Symbolic AI</title>
+    <title>Dashboard Arsitektur Neuro-Symbolic AI v2.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -15,41 +15,43 @@
             background-color: var(--bg-dark); 
             height: 100vh;
             overflow: hidden;
+            font-family: 'Inter', sans-serif;
         }
         .neural-line {
             stroke: var(--neural-glow);
             stroke-dasharray: 4;
             animation: flow 3s linear infinite;
-            opacity: 0.3;
+            opacity: 0.15;
         }
         @keyframes flow {
             from { stroke-dashoffset: 40; }
             to { stroke-dashoffset: 0; }
         }
         .active-logic {
-            filter: drop-shadow(0 0 12px var(--symbolic-glow));
+            filter: drop-shadow(0 0 15px var(--symbolic-glow));
             stroke: var(--symbolic-glow);
             stroke-width: 3px;
             fill: var(--symbolic-glow) !important;
         }
         .terminal-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem; /* Ukuran font lebih besar */
+            font-family: 'Fira Code', 'Courier New', monospace;
         }
         .cbam-box {
             border: 2px solid #fbbf24;
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.7);
         }
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
+        .log-entry {
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+            padding: 2px 0;
+            animation: fadeIn 0.3s ease-out;
         }
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-5px); }
+            to { opacity: 1; transform: translateX(0); }
         }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         @media (max-width: 1024px) {
             body { height: auto; overflow: auto; }
         }
@@ -58,15 +60,18 @@
 <body class="text-slate-200 flex flex-col">
 
     <!-- Header -->
-    <header class="p-4 border-b border-slate-800 bg-slate-900/50 shrink-0">
+    <header class="p-4 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md shrink-0 z-50">
         <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div>
-                <h1 class="text-2xl font-black tracking-tighter text-white">NEURO-SYMBOLIC <span class="text-indigo-500">ENGINE</span></h1>
-                <p class="text-slate-400 text-xs italic">Optimasi: ResNet-34 + CBAM + Temperature Scaling</p>
+                <h1 class="text-2xl font-black tracking-tighter text-white flex items-center">
+                    <span class="bg-indigo-600 px-2 py-0.5 rounded mr-2 text-sm">NS-AI</span>
+                    NEURO-SYMBOLIC <span class="text-indigo-400 ml-2">CORE</span>
+                </h1>
+                <p class="text-slate-500 text-[10px] uppercase font-bold tracking-[0.2em]">ResNet-34 + CBAM + RDF Logic Validator</p>
             </div>
-            <div class="flex gap-3">
-                <button onclick="runPipeline('brown_spot')" class="px-6 py-2 rounded-full bg-emerald-600 border border-emerald-500 text-white hover:bg-emerald-500 transition-all text-sm font-bold shadow-lg shadow-emerald-500/20">UJI BROWN SPOT</button>
-                <button onclick="runPipeline('bacterial_streak')" class="px-6 py-2 rounded-full bg-indigo-600 border border-indigo-500 text-white hover:bg-indigo-500 transition-all text-sm font-bold shadow-lg shadow-indigo-500/20">UJI BACTERIAL STREAK</button>
+            <div class="flex gap-4">
+                <button onclick="runPipeline('brown_spot')" class="px-6 py-2 rounded-lg bg-emerald-600/10 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all text-xs font-black shadow-lg">RUN: BROWN SPOT</button>
+                <button onclick="runPipeline('bacterial_streak')" class="px-6 py-2 rounded-lg bg-indigo-600/10 border border-indigo-500/50 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-all text-xs font-black shadow-lg">RUN: BACTERIAL STREAK</button>
             </div>
         </div>
     </header>
@@ -74,30 +79,39 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-[1600px] mx-auto p-4 grid grid-cols-12 gap-4 overflow-hidden w-full">
         
-        <!-- KOLOM 1: SENSORIK & NEURAL (SISTEM 1) -->
+        <!-- KOLOM 1: SENSORIK & NEURAL LOG -->
         <div class="col-span-12 lg:col-span-4 flex flex-col gap-4 h-full overflow-hidden">
-            <!-- Input diperkecil -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[35%] min-h-0 shadow-xl">
+            <!-- Input UI -->
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 flex flex-col h-[30%] min-h-0 shadow-2xl relative overflow-hidden">
                 <div class="flex justify-between items-center mb-2 shrink-0">
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Input Sensorik (Piksel)</h3>
-                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-mono" id="status-tag">STATUS: LIVE</span>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center">
+                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
+                        Raw Pixel Input
+                    </h3>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-mono">256x256 RGB</span>
                 </div>
-                <div class="flex-1 bg-black rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden">
-                    <div id="image-container" class="text-6xl transition-all duration-500">🌿</div>
+                <div class="flex-1 bg-black rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden group">
+                    <div id="image-container" class="text-7xl transition-all duration-700 group-hover:scale-110">🌿</div>
                     <div id="cbam-overlay" class="absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none flex items-center justify-center">
-                        <div class="cbam-box w-16 h-16 rounded-lg animate-pulse"></div>
+                        <div class="cbam-box w-20 h-20 rounded-lg animate-pulse"></div>
                     </div>
-                </div>
-                <div class="mt-2 terminal-text text-emerald-400 bg-black/40 p-2 rounded h-10 flex items-center shrink-0 border-l-2 border-emerald-500">
-                    <div id="neural-log" class="leading-tight truncate">> Standby...</div>
                 </div>
             </div>
 
-            <!-- Neural Map diperbesar -->
+            <!-- Historical Neural Log (Ditinggikan & Historikal) -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col h-[35%] min-h-0 shadow-inner">
+                <h3 class="text-[10px] font-bold text-emerald-600 uppercase mb-2 tracking-widest shrink-0">Neural Processing History</h3>
+                <div id="neural-log" class="flex-1 overflow-y-auto terminal-text text-[11px] text-emerald-400/80 leading-relaxed space-y-1">
+                    <div class="opacity-50 italic">> System initialized. Awaiting tensor...</div>
+                </div>
+            </div>
+
+            <!-- Neural Feature Map (Dibuat Full Connect) -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col min-h-0 shadow-xl overflow-hidden">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-2 text-center shrink-0 tracking-widest">Neural Feature Map (ResNet-34)</h3>
-                <div class="flex-1 flex items-center justify-center min-h-0">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-2 text-center shrink-0 tracking-widest">Global Feature Map (ResNet-34)</h3>
+                <div class="flex-1 flex items-center justify-center min-h-0 relative">
                     <svg id="neural-svg" viewBox="0 0 300 200" class="w-full h-full max-h-full">
+                        <g id="n-links"></g>
                         <g id="n-layer-1"></g>
                         <g id="n-layer-2"></g>
                         <g id="n-layer-3"></g>
@@ -106,81 +120,87 @@
             </div>
         </div>
 
-        <!-- KOLOM 2: KNOWLEDGE & REASONER (SISTEM 2) -->
+        <!-- KOLOM 2: KNOWLEDGE & REASONER -->
         <div class="col-span-12 lg:col-span-5 flex flex-col h-full gap-4 overflow-hidden">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative flex-1 flex flex-col min-h-0 shadow-xl">
-                <div class="flex justify-between items-center mb-2 shrink-0 border-b border-slate-800 pb-2">
-                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Reasoner & Knowledge Graph</h3>
-                    <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[9px] font-mono italic">SYST 2: LOGIKA FORMAL</span>
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl relative flex-1 flex flex-col min-h-0 shadow-2xl p-6">
+                <!-- Reasoner Log Naik ke Atas & Font Diperbesar -->
+                <div class="mb-4 shrink-0 bg-indigo-950/40 rounded-2xl p-5 border-l-4 border-indigo-500 shadow-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-[11px] font-black text-indigo-400 uppercase tracking-[0.2em]">Symbolic Reasoner Activity</h3>
+                        <span class="text-[10px] font-mono text-indigo-500/70">RDF/XML Stream</span>
+                    </div>
+                    <div id="symbolic-log" class="terminal-text text-[14px] text-indigo-100 font-medium leading-relaxed min-h-[100px]">
+                        <span class="opacity-30 italic">System idle. Logic engines standing by for perceptual grounding...</span>
+                    </div>
                 </div>
                 
-                <!-- Reasoner Log Naik ke Atas & Lebih Jelas -->
-                <div class="terminal-text text-indigo-300 bg-indigo-950/30 p-4 border-l-4 border-indigo-500 rounded mb-4 shrink-0 shadow-inner">
-                    <div class="font-bold mb-1 text-[10px] text-indigo-400 underline uppercase">Live Reasoner Log:</div>
-                    <div id="symbolic-log" class="text-[13px] leading-relaxed min-h-[60px]">Awaiting evidentiary grounding from neural backbone...</div>
-                </div>
-
                 <div class="flex-1 flex items-center justify-center min-h-0">
                     <svg id="kg-svg" viewBox="0 0 400 300" class="w-full h-full max-h-full">
-                        <path d="M200,50 L100,150" stroke="#1e293b" stroke-width="2" id="path-a"/>
-                        <path d="M200,50 L300,150" stroke="#1e293b" stroke-width="2" id="path-b"/>
+                        <path d="M200,60 L100,160" stroke="#1e293b" stroke-width="2" id="path-a"/>
+                        <path d="M200,60 L300,160" stroke="#1e293b" stroke-width="2" id="path-b"/>
                         
-                        <circle cx="200" cy="50" r="18" fill="#1e293b" class="logic-node transition-all duration-500" id="node-disease" />
-                        <text x="200" y="25" text-anchor="middle" fill="#6366f1" class="text-[12px] font-black">PENYAKIT</text>
+                        <circle cx="200" cy="60" r="22" fill="#1e293b" class="logic-node transition-all duration-500" id="node-disease" />
+                        <text x="200" y="30" text-anchor="middle" fill="#6366f1" class="text-[12px] font-black tracking-widest">DISEASE</text>
                         
-                        <circle cx="100" cy="150" r="15" fill="#1e293b" class="logic-node transition-all duration-500" id="node-symptom-a" />
-                        <text x="80" y="140" text-anchor="end" fill="#94a3b8" class="text-[10px] font-bold">LESİ COKLAT</text>
+                        <circle cx="100" cy="160" r="18" fill="#1e293b" class="logic-node transition-all duration-500" id="node-symptom-a" />
+                        <text x="80" y="145" text-anchor="end" fill="#94a3b8" class="text-[10px] font-bold">BROWN LESION</text>
                         
-                        <circle cx="300" cy="150" r="15" fill="#1e293b" class="logic-node transition-all duration-500" id="node-symptom-b" />
-                        <text x="320" y="140" text-anchor="start" fill="#94a3b8" class="text-[10px] font-bold">GARIS PUTIH</text>
+                        <circle cx="300" cy="160" r="18" fill="#1e293b" class="logic-node transition-all duration-500" id="node-symptom-b" />
+                        <text x="320" y="145" text-anchor="start" fill="#94a3b8" class="text-[10px] font-bold">WHITE STREAK</text>
                     </svg>
                 </div>
 
-                <!-- Log Penjelasan 97% -->
-                <div class="mt-2 p-3 bg-slate-950/50 rounded-xl border border-slate-800 shrink-0">
-                    <div class="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-tighter flex items-center">
-                        <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span> Logic Explanation (Calibration)
+                <!-- Technical Calibration Explanation -->
+                <div class="mt-4 p-4 bg-slate-950/80 rounded-2xl border border-slate-800 shrink-0">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter flex items-center">
+                            <span class="w-2 h-2 bg-amber-500 rounded-full mr-2 shadow-[0_0_8px_#f59e0b]"></span>
+                            Model Calibration Log (Singh et al. 2026)
+                        </div>
+                        <span class="text-[9px] font-mono text-slate-600">Temp Scaler v1.0</span>
                     </div>
-                    <div id="calibration-log" class="text-[11px] text-slate-400 italic font-mono leading-tight">
-                        Logit awal dikalibrasi via Temperature Scaling (T=1.069) untuk mengurangi overconfidence dan menyeimbangkan probabilitas empiris.
+                    <div id="calibration-log" class="text-[11px] text-slate-400 italic font-mono leading-snug">
+                        Logits default cenderung overconfident. Calibration split (ECE: 1.35%) menyeimbangkan output via Temperature Scaling parameter $T$.
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- KOLOM 3: AUDIT & TRIAGE -->
+        <!-- KOLOM 3: FINAL AUDIT -->
         <div class="col-span-12 lg:col-span-3 flex flex-col h-full overflow-hidden">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col min-h-0 shadow-xl">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-4 text-center shrink-0 tracking-widest border-b border-slate-800 pb-2">Final Triage</h3>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex-1 flex flex-col min-h-0 shadow-xl border-t-4 border-indigo-500">
+                <h3 class="text-[11px] font-black text-slate-400 uppercase mb-6 text-center shrink-0 tracking-[0.3em]">Operational Audit</h3>
                 
-                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-6 opacity-40 grayscale transition-all duration-1000 scale-95 min-h-0">
-                    <div id="audit-icon" class="w-20 h-20 rounded-full flex items-center justify-center bg-slate-800 text-3xl transition-all duration-500 shrink-0 shadow-lg">?</div>
-                    <div class="shrink-0">
-                        <div id="audit-status" class="text-[10px] font-black tracking-widest text-slate-500 mb-1 uppercase">STATUS: PENDING</div>
-                        <h2 id="final-diagnosis" class="text-3xl font-black text-white tracking-tight">--</h2>
+                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-6 opacity-20 grayscale transition-all duration-1000 scale-95 min-h-0">
+                    <div id="audit-icon" class="w-24 h-24 rounded-full flex items-center justify-center bg-slate-800 text-4xl transition-all duration-700 shadow-inner border-2 border-slate-700">?</div>
+                    <div class="shrink-0 space-y-1">
+                        <div id="audit-status" class="text-[11px] font-black tracking-widest text-slate-600 uppercase">STATUS: AWAITING</div>
+                        <h2 id="final-diagnosis" class="text-3xl font-black text-white tracking-tighter">--</h2>
                     </div>
                     
-                    <div class="w-full space-y-2 shrink-0 px-4">
-                        <div class="flex justify-between text-[10px] font-bold uppercase">
+                    <div class="w-full space-y-3 shrink-0 px-2">
+                        <div class="flex justify-between text-[11px] font-bold uppercase">
                             <span class="text-slate-500">Neural Confidence</span>
-                            <span id="conf-val" class="text-emerald-400 font-mono text-sm">0.0%</span>
+                            <span id="conf-val" class="text-emerald-400 font-mono text-base">0.0%</span>
                         </div>
-                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                            <div id="conf-bar" class="h-full bg-emerald-500 w-0 transition-all duration-1000 shadow-[0_0_10px_#10b981]"></div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                            <div id="conf-bar" class="h-full bg-emerald-500 w-0 transition-all duration-1000 shadow-[0_0_15px_#10b981]"></div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/50 p-4 rounded-2xl w-full border border-slate-700 shrink-0 shadow-inner">
-                        <p id="rationale-text" class="text-[12px] text-slate-200 italic leading-snug">"Sistem siap menerima input untuk analisis neuro-simbolik."</p>
+                    <div class="bg-slate-800/40 p-5 rounded-2xl w-full border border-slate-700/50 shrink-0">
+                        <p id="rationale-text" class="text-[13px] text-slate-300 italic leading-relaxed">"Sistem siap melakukan audit diagnosis berbasis aturan agronomi."</p>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-800 shrink-0 flex justify-between items-center opacity-50">
-                    <div class="text-[8px] text-slate-500 font-mono leading-tight">
-                        SINGH ET AL. (2026)<br>
-                        MODEL: RESNET-CBAM-KG
+                <div class="mt-6 pt-4 border-t border-slate-800 shrink-0 flex flex-col gap-2">
+                    <div class="flex justify-between items-center opacity-40 text-[9px] font-mono">
+                        <span>PADDYDOCTOR CORPUS</span>
+                        <span>RESNET-34-CBAM</span>
                     </div>
-                    <div class="text-[8px] bg-slate-800 p-1 px-2 rounded font-bold uppercase">XAI VALIDATED</div>
+                    <div class="bg-indigo-900/20 text-indigo-400 text-[10px] p-2 rounded text-center font-bold border border-indigo-500/20">
+                        EXPLAINABLE AI (XAI) VALIDATED
+                    </div>
                 </div>
             </div>
         </div>
@@ -191,73 +211,89 @@
         const samples = {
             brown_spot: { 
                 emoji: "🍂", 
-                perception: "Terdeteksi: Lesi Coklat Elips", 
-                rules: "MATCH: Symptom(?s) ∧ isSymptomOf(?s, BrownSpot) → Verified",
+                perception: "Detected ellipsoid brown lesions with yellow halo margins.", 
+                rules: "MATCH: lesion_color(brown) ∧ lesion_shape(ellipsoid) → symptom(BrownSpot)",
                 diagnosis: "BROWN SPOT", 
                 conf: 0.9713, 
                 status: "ALIGNED", 
                 targetNode: "node-symptom-a",
                 path: "path-a",
-                rationale: "Neural mendeteksi lesi elips. Simbolik memvalidasi ini sesuai dengan ontologi RDF Brown Spot.",
-                calibration: "Confidence 97.13% berasal dari output Softmax yang telah dikalibrasi via Temperature Scaling (T) untuk akurasi statistik yang lebih jujur."
+                rationale: "Model neural mendeteksi lesi elips. Penjelasan logis: 97.13% akurasi dicapai melalui Temperature Scaling (T=1.0691) yang divalidasi oleh ontologi agronomi.",
+                calibration: "Kenapa 97.13%? Karena Brier Score model turun menjadi 0.0758 setelah kalibrasi, memastikan probabilitas empiris mendekati akurasi dunia nyata."
             },
             bacterial_streak: { 
                 emoji: "🌾", 
-                perception: "Terdeteksi: Garis Putih Linear", 
-                rules: "MATCH: Symptom(?s) ∧ isSymptomOf(?s, BacterialStreak) → Verified",
+                perception: "Detected linear white-to-translucent streaks on leaf lamina.", 
+                rules: "MATCH: streak_pattern(linear) ∧ streak_color(white) → symptom(BacterialStreak)",
                 diagnosis: "BACTERIAL STREAK", 
                 conf: 0.9245, 
                 status: "ALIGNED", 
                 targetNode: "node-symptom-b",
                 path: "path-b",
-                rationale: "Neural mendeteksi tekstur kasar. Simbolik memvalidasi sebagai Bacterial Leaf Streak.",
-                calibration: "92.45% Confidence mencerminkan korelasi kuat antara fitur spasial linear dengan aturan infeksi bakteri X.oryzae."
+                rationale: "Pola linear terdeteksi kuat. Meskipun confidence tinggi, audit state ALIGNED karena struktur lesi sesuai dengan profil infeksi X.oryzae.",
+                calibration: "92.45% Confidence mencerminkan ketidakpastian yang sehat pada tepi lesi yang buram (Gaussian blur robustness: 32.13%)."
             }
         };
 
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
-        function initNeural() {
-            const svg = document.getElementById('neural-svg');
-            const svgHeight = 200; 
-            const drawLayer = (x, count, id) => {
-                const group = document.getElementById(id);
-                const spacing = 22; 
-                const totalHeight = (count - 1) * spacing;
-                const startY = (svgHeight - totalHeight) / 2;
+        function appendLog(id, text, type = 'info') {
+            const container = document.getElementById(id);
+            const div = document.createElement('div');
+            div.className = `log-entry ${type === 'success' ? 'text-white font-bold' : ''}`;
+            div.innerHTML = `> ${text}`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
 
-                for(let i=0; i<count; i++) {
+        function initNeural() {
+            const svgLinks = document.getElementById('n-links');
+            const svgHeight = 200; 
+            const layers = [
+                { id: 'n-layer-1', count: 5, x: 30 },
+                { id: 'n-layer-2', count: 8, x: 150 },
+                { id: 'n-layer-3', count: 4, x: 270 }
+            ];
+
+            const nodePositions = [];
+
+            // Draw Layers & Store Positions
+            layers.forEach((layer) => {
+                const group = document.getElementById(layer.id);
+                const spacing = 24; 
+                const startY = (svgHeight - (layer.count - 1) * spacing) / 2;
+                const layerNodes = [];
+
+                for(let i=0; i<layer.count; i++) {
                     const y = startY + (i * spacing);
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", x);
+                    circle.setAttribute("cx", layer.x);
                     circle.setAttribute("cy", y);
                     circle.setAttribute("r", 5);
                     circle.setAttribute("fill", "#1e293b");
-                    circle.setAttribute("class", "n-node transition-all duration-500 shadow-lg");
+                    circle.setAttribute("class", "n-node transition-all duration-700 shadow-xl");
                     group.appendChild(circle);
-                    
-                    if (id !== 'n-layer-3') {
-                        const nextCount = id === 'n-layer-1' ? 6 : 3;
-                        const nextX = x + 100;
-                        const nextTotalHeight = (nextCount - 1) * spacing;
-                        const nextStartY = (svgHeight - nextTotalHeight) / 2;
-
-                        for(let j=0; j<nextCount; j++) {
-                            const ny = nextStartY + (j * spacing);
-                            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                            line.setAttribute("x1", x);
-                            line.setAttribute("y1", y);
-                            line.setAttribute("x2", nextX);
-                            line.setAttribute("y2", ny);
-                            line.setAttribute("class", "neural-line transition-all");
-                            svg.insertBefore(line, group);
-                        }
-                    }
+                    layerNodes.push({ x: layer.x, y: y });
                 }
-            };
-            drawLayer(30, 4, 'n-layer-1');
-            drawLayer(130, 8, 'n-layer-2'); // Hidden layer diperbanyak agar map terlihat padat
-            drawLayer(230, 3, 'n-layer-3');
+                nodePositions.push(layerNodes);
+            });
+
+            // Draw FULLY CONNECTED Links (Fix: No disconnected nodes)
+            for(let l=0; l < nodePositions.length - 1; l++) {
+                const currentLayer = nodePositions[l];
+                const nextLayer = nodePositions[l+1];
+                currentLayer.forEach(curr => {
+                    nextLayer.forEach(next => {
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", curr.x);
+                        line.setAttribute("y1", curr.y);
+                        line.setAttribute("x2", next.x);
+                        line.setAttribute("y2", next.y);
+                        line.setAttribute("class", "neural-line transition-all");
+                        svgLinks.appendChild(line);
+                    });
+                });
+            }
         }
 
         async function runPipeline(key) {
@@ -268,8 +304,10 @@
             const triage = document.getElementById('triage-card');
             
             // RESET
+            nLog.innerHTML = "";
+            sLog.innerHTML = '<span class="opacity-30 italic">Reasoner initializing connection to neural backbone...</span>';
             document.getElementById('status-tag').innerText = "STATUS: PROCESSING";
-            triage.classList.add('grayscale', 'opacity-40', 'scale-95');
+            triage.classList.add('grayscale', 'opacity-20', 'scale-95');
             document.getElementById('cbam-overlay').classList.add('opacity-0');
             document.querySelectorAll('.n-node').forEach(c => c.setAttribute('fill', '#1e293b'));
             document.querySelectorAll('.logic-node').forEach(c => {
@@ -277,54 +315,54 @@
                 c.setAttribute('fill', '#1e293b');
             });
             document.querySelectorAll('#kg-svg path').forEach(p => p.setAttribute('stroke', '#1e293b'));
-            cLog.innerText = "Standby...";
 
-            // TAHAP 1: INPUT SCAN (1.5 detik)
+            // TAHAP 1: INPUT SCAN
             document.getElementById('image-container').innerText = data.emoji;
-            nLog.innerHTML = `> <span class="loading-dots">Preprocessing tensor gambar</span>`;
-            await sleep(1500);
+            appendLog('neural-log', 'Input tensor: [1, 3, 256, 256]');
+            await sleep(1000);
+            appendLog('neural-log', 'Normalizing to ImageNet stats...');
+            await sleep(800);
 
-            // TAHAP 2: NEURAL EXTRACTION (2.5 detik)
-            nLog.innerHTML = `> <span class="loading-dots">Fitur ResNet-34 + CBAM</span>`;
+            // TAHAP 2: NEURAL EXTRACTION
+            appendLog('neural-log', 'Layer 1: Initial Conv block... (ResNet34)');
             document.querySelectorAll('#n-layer-1 circle').forEach((c, i) => {
-                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 150);
-            });
-            await sleep(2000);
-            
-            // CBAM ATTENTION (2.5 detik)
-            document.getElementById('cbam-overlay').classList.remove('opacity-0');
-            document.querySelectorAll('#n-layer-2 circle').forEach((c, i) => {
                 setTimeout(() => c.setAttribute('fill', '#10b981'), i * 100);
             });
-            await sleep(2500);
+            await sleep(1500);
             
-            nLog.innerHTML = `> <span class="text-white font-bold">DETEKSI: ${data.diagnosis}</span>`;
+            appendLog('neural-log', 'Applying CBAM Attention module...');
+            document.getElementById('cbam-overlay').classList.remove('opacity-0');
+            document.querySelectorAll('#n-layer-2 circle').forEach((c, i) => {
+                setTimeout(() => c.setAttribute('fill', '#10b981'), i * 80);
+            });
+            await sleep(1800);
+            
+            appendLog('neural-log', `Feature perception: "${data.perception}"`, 'success');
             document.querySelectorAll('#n-layer-3 circle').forEach(c => c.setAttribute('fill', '#fbbf24'));
 
-            // TAHAP 3: SYMBOLIC REASONING (3.5 detik)
-            sLog.innerHTML = `> Menunggu bukti grounding...<br><span class="loading-dots text-white">Menghubungkan Probabilitas ke Simbol Logika</span>`;
+            // TAHAP 3: SYMBOLIC REASONING
+            sLog.innerHTML = `<span class="text-indigo-400">> Perception grounded into logical atoms.</span><br><span class="loading-dots text-white">> Checking Rule: ${data.rules}</span>`;
             await sleep(2000);
             
             document.getElementById(data.targetNode).classList.add('active-logic');
-            sLog.innerHTML = `> Simbol Terdeteksi: <span class="text-white">[${data.perception}]</span><br>> <span class="text-indigo-400 font-bold">${data.rules}</span>`;
+            sLog.innerHTML = `<div class="text-indigo-300">> Found witness in RDF/OWL: <span class="text-white">${data.diagnosis}_ONTOLOGY</span></div><div class="text-indigo-400 mt-1 font-bold">> SYMBOLIC ALIGNMENT: 100% SUCCESS</div>`;
             await sleep(1500);
             
             document.getElementById(data.path).setAttribute('stroke', '#6366f1');
             document.getElementById('node-disease').classList.add('active-logic');
-            sLog.innerHTML += `<br>> <span class="text-emerald-400 font-black">AUDIT STATE: ALIGNED</span>`;
 
             // TAHAP 4: CALIBRATION EXPLANATION
-            cLog.innerText = data.calibration;
+            cLog.innerHTML = `<span class='text-white font-bold'>${data.conf*100}% Expl:</span> ${data.calibration}`;
 
-            // TAHAP 5: FINAL AUDIT (2 detik)
+            // TAHAP 5: FINAL AUDIT
             await sleep(1500);
             document.getElementById('status-tag').innerText = "STATUS: LIVE";
             
-            triage.classList.remove('grayscale', 'opacity-40', 'scale-95');
+            triage.classList.remove('grayscale', 'opacity-20', 'scale-95');
             document.getElementById('audit-status').innerText = `AUDIT: ${data.status}`;
-            document.getElementById('audit-status').className = "text-[10px] font-black tracking-widest text-emerald-500 mb-1";
+            document.getElementById('audit-status').className = "text-[11px] font-black tracking-widest text-emerald-500 mb-1";
             document.getElementById('audit-icon').innerText = "✅";
-            document.getElementById('audit-icon').className = "w-20 h-20 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500 text-4xl border-2 border-emerald-500/50 shadow-[0_0_20px_#10b98144]";
+            document.getElementById('audit-icon').className = "w-24 h-24 rounded-full flex items-center justify-center bg-emerald-500/10 text-emerald-500 text-4xl border-2 border-emerald-500/50 shadow-2xl";
             
             document.getElementById('final-diagnosis').innerText = data.diagnosis;
             document.getElementById('conf-val').innerText = (data.conf * 100).toFixed(2) + "%";
