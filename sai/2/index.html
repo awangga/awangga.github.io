@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arsitektur Detil Neuro-Symbolic AI</title>
+    <title>Dashboard Arsitektur Neuro-Symbolic AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -11,7 +11,11 @@
             --symbolic-glow: #6366f1;
             --bg-dark: #0f172a;
         }
-        body { background-color: var(--bg-dark); }
+        body { 
+            background-color: var(--bg-dark); 
+            height: 100vh;
+            overflow: hidden; /* Mencegah scroll pada body */
+        }
         .neural-line {
             stroke: var(--neural-glow);
             stroke-dasharray: 4;
@@ -30,7 +34,7 @@
         }
         .terminal-text {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
         .cbam-box {
             border: 2px solid #fbbf24;
@@ -46,47 +50,52 @@
             60% { content: '...'; }
             80%, 100% { content: ''; }
         }
+        /* Responsivitas untuk layar kecil tetap diizinkan scroll */
+        @media (max-width: 1024px) {
+            body { height: auto; overflow: auto; }
+        }
     </style>
 </head>
-<body class="text-slate-200">
+<body class="text-slate-200 flex flex-col">
 
-    <header class="p-8 border-b border-slate-800 bg-slate-900/50">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Header - Fixed Height -->
+    <header class="p-4 border-b border-slate-800 bg-slate-900/50 shrink-0">
+        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
             <div>
-                <h1 class="text-3xl font-black tracking-tighter text-white">NEURO-SYMBOLIC <span class="text-indigo-500">ENGINE</span></h1>
-                <p class="text-slate-400 text-sm italic">Integrasi ResNet-34 (Persepsi) & Knowledge Graph (Audit Logika)</p>
+                <h1 class="text-2xl font-black tracking-tighter text-white">NEURO-SYMBOLIC <span class="text-indigo-500">ENGINE</span></h1>
+                <p class="text-slate-400 text-xs italic">ResNet-34 + CBAM + Knowledge Graph (Audit Logika)</p>
             </div>
-            <div class="flex gap-4">
-                <button onclick="runPipeline('brown_spot')" class="px-6 py-3 rounded-full bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-600/40 transition-all text-sm font-bold shadow-lg shadow-emerald-500/10">UJI BROWN SPOT</button>
-                <button onclick="runPipeline('bacterial_streak')" class="px-6 py-3 rounded-full bg-indigo-600/20 border border-indigo-500/50 text-indigo-400 hover:bg-indigo-600/40 transition-all text-sm font-bold shadow-lg shadow-indigo-500/10">UJI BACTERIAL STREAK</button>
+            <div class="flex gap-2">
+                <button onclick="runPipeline('brown_spot')" class="px-5 py-2 rounded-full bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-600/40 transition-all text-xs font-bold shadow-lg">UJI BROWN SPOT</button>
+                <button onclick="runPipeline('bacterial_streak')" class="px-5 py-2 rounded-full bg-indigo-600/20 border border-indigo-500/50 text-indigo-400 hover:bg-indigo-600/40 transition-all text-xs font-bold shadow-lg">UJI BACTERIAL STREAK</button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-6 grid grid-cols-12 gap-6">
+    <!-- Main Content - Flexible Height -->
+    <main class="flex-1 max-w-[1600px] mx-auto p-4 grid grid-cols-12 gap-4 overflow-hidden w-full">
         
-        <!-- KOLOM 1: INPUT & NEURAL (Sistem 1) -->
-        <div class="col-span-12 lg:col-span-4 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase">Input Sensorik (Piksel)</h3>
-                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-mono" id="status-tag">STATUS: LIVE</span>
+        <!-- KOLOM 1: INPUT & NEURAL -->
+        <div class="col-span-12 lg:col-span-4 flex flex-col gap-4 h-full overflow-hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col flex-1 min-h-0 shadow-xl">
+                <div class="flex justify-between items-center mb-2 shrink-0">
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase">Input Sensorik</h3>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-mono" id="status-tag">STATUS: LIVE</span>
                 </div>
-                <div class="aspect-square bg-black rounded-xl border border-slate-700 flex items-center justify-center relative">
-                    <div id="image-container" class="text-8xl transition-all duration-500">🌿</div>
-                    <!-- CBAM Overlay -->
+                <div class="flex-1 bg-black rounded-xl border border-slate-700 flex items-center justify-center relative min-h-0 overflow-hidden">
+                    <div id="image-container" class="text-7xl lg:text-8xl transition-all duration-500">🌿</div>
                     <div id="cbam-overlay" class="absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none flex items-center justify-center">
-                        <div class="cbam-box w-24 h-24 rounded-lg animate-pulse"></div>
+                        <div class="cbam-box w-20 h-20 rounded-lg animate-pulse"></div>
                     </div>
                 </div>
-                <div class="mt-4 terminal-text text-emerald-500 bg-black/40 p-3 rounded h-20 flex flex-col justify-center">
-                    <div id="neural-log" class="leading-relaxed">> Awaiting input signal...</div>
+                <div class="mt-3 terminal-text text-emerald-500 bg-black/40 p-2 rounded h-12 flex items-center shrink-0">
+                    <div id="neural-log" class="leading-tight">> Awaiting signal...</div>
                 </div>
             </div>
 
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-500 uppercase mb-4 text-center">Neural Feature Map (ResNet-34)</h3>
-                <svg id="neural-svg" viewBox="0 0 300 150" class="w-full h-48">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 h-48 shrink-0 shadow-xl overflow-hidden">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-2 text-center">Neural Feature Map (ResNet-34)</h3>
+                <svg id="neural-svg" viewBox="0 0 300 150" class="w-full h-36">
                     <g id="n-layer-1"></g>
                     <g id="n-layer-2"></g>
                     <g id="n-layer-3"></g>
@@ -94,16 +103,16 @@
             </div>
         </div>
 
-        <!-- KOLOM 2: GROUNDING BRIDGE & SYMBOLIC (Sistem 2) -->
-        <div class="col-span-12 lg:col-span-5 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 relative h-full flex flex-col">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Knowledge Graph (RDF/OWL)</h3>
-                    <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-mono italic">SYST 2: SLOW THINKING</span>
+        <!-- KOLOM 2: KNOWLEDGE GRAPH -->
+        <div class="col-span-12 lg:col-span-5 flex flex-col h-full overflow-hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 relative flex-1 flex flex-col min-h-0 shadow-xl">
+                <div class="flex justify-between items-center mb-2 shrink-0">
+                    <h3 class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Knowledge Graph (RDF/OWL)</h3>
+                    <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[9px] font-mono italic">SYST 2: SLOW THINKING</span>
                 </div>
                 
-                <div class="flex-1 flex items-center justify-center">
-                    <svg id="kg-svg" viewBox="0 0 400 300" class="w-full h-full max-h-[350px]">
+                <div class="flex-1 flex items-center justify-center min-h-0">
+                    <svg id="kg-svg" viewBox="0 0 400 300" class="w-full h-full max-h-full">
                         <path d="M200,50 L100,150" stroke="#1e293b" stroke-width="2" id="path-a"/>
                         <path d="M200,50 L300,150" stroke="#1e293b" stroke-width="2" id="path-b"/>
                         
@@ -118,42 +127,42 @@
                     </svg>
                 </div>
 
-                <div class="terminal-text text-indigo-300 bg-indigo-900/20 p-4 border-l-4 border-indigo-500 rounded mt-4 h-24 overflow-hidden">
-                    <div class="font-bold mb-1 underline">REASONER LOG:</div>
-                    <div id="symbolic-log">IDLE: Menunggu bukti dari sistem neural...</div>
+                <div class="terminal-text text-indigo-300 bg-indigo-900/20 p-3 border-l-4 border-indigo-500 rounded mt-2 h-20 shrink-0 overflow-y-auto">
+                    <div class="font-bold mb-1 text-[9px] underline uppercase">Reasoner Log:</div>
+                    <div id="symbolic-log" class="text-[10px]">IDLE: Menunggu bukti dari sistem neural...</div>
                 </div>
             </div>
         </div>
 
         <!-- KOLOM 3: AUDIT & TRIAGE -->
-        <div class="col-span-12 lg:col-span-3 space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 h-full flex flex-col">
-                <h3 class="text-xs font-bold text-slate-500 uppercase mb-6 text-center">Hasil Audit & Triage</h3>
+        <div class="col-span-12 lg:col-span-3 flex flex-col h-full overflow-hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col min-h-0 shadow-xl">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-4 text-center shrink-0">Hasil Audit & Triage</h3>
                 
-                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-6 opacity-40 grayscale transition-all duration-1000 scale-95">
-                    <div id="audit-icon" class="w-20 h-20 rounded-full flex items-center justify-center bg-slate-800 text-3xl transition-colors duration-500">?</div>
-                    <div>
-                        <div id="audit-status" class="text-xs font-black tracking-widest text-slate-500 mb-2 uppercase">STATUS: PENDING</div>
-                        <h2 id="final-diagnosis" class="text-2xl font-black text-white">--</h2>
+                <div id="triage-card" class="flex-1 flex flex-col justify-center items-center text-center space-y-4 opacity-40 grayscale transition-all duration-1000 scale-95 min-h-0 overflow-y-auto">
+                    <div id="audit-icon" class="w-16 h-16 rounded-full flex items-center justify-center bg-slate-800 text-2xl transition-colors duration-500 shrink-0">?</div>
+                    <div class="shrink-0">
+                        <div id="audit-status" class="text-[9px] font-black tracking-widest text-slate-500 mb-1 uppercase">STATUS: PENDING</div>
+                        <h2 id="final-diagnosis" class="text-xl font-black text-white">--</h2>
                     </div>
                     
-                    <div class="w-full space-y-2">
-                        <div class="flex justify-between text-[10px] font-bold">
+                    <div class="w-full space-y-1 shrink-0 px-2">
+                        <div class="flex justify-between text-[9px] font-bold">
                             <span class="text-slate-500 uppercase">Neural Confidence</span>
                             <span id="conf-val" class="text-emerald-400">0.0%</span>
                         </div>
-                        <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
                             <div id="conf-bar" class="h-full bg-emerald-500 w-0 transition-all duration-1000"></div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-800/50 p-4 rounded-xl w-full border border-slate-700">
-                        <p id="rationale-text" class="text-[10px] text-slate-400 italic">"Pilih sampel untuk memulai diagnosa mendalam."</p>
+                    <div class="bg-slate-800/50 p-3 rounded-xl w-full border border-slate-700 shrink-0">
+                        <p id="rationale-text" class="text-[10px] text-slate-400 italic leading-snug">"Pilih sampel di atas untuk memulai diagnosa."</p>
                     </div>
                 </div>
 
-                <div class="mt-auto pt-6 border-t border-slate-800">
-                    <div class="text-[9px] text-slate-600 font-mono">
+                <div class="mt-4 pt-4 border-t border-slate-800 shrink-0">
+                    <div class="text-[8px] text-slate-600 font-mono leading-tight">
                         REF: SINGH ET AL. (2026)<br>
                         FRAMEWORK: RESNET-CBAM-KG
                     </div>
@@ -240,9 +249,8 @@
             const triage = document.getElementById('triage-card');
             const statusTag = document.getElementById('status-tag');
             
-            // RESET
             statusTag.innerText = "STATUS: BUSY";
-            statusTag.className = "px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-mono";
+            statusTag.className = "px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[9px] font-mono";
             triage.classList.add('grayscale', 'opacity-40', 'scale-95');
             document.getElementById('cbam-overlay').classList.add('opacity-0');
             document.querySelectorAll('.n-node').forEach(c => c.setAttribute('fill', '#1e293b'));
@@ -252,30 +260,26 @@
             });
             document.querySelectorAll('#kg-svg path').forEach(p => p.setAttribute('stroke', '#1e293b'));
 
-            // TAHAP 1: INPUT SCAN (1.5 detik)
             document.getElementById('image-container').innerText = data.emoji;
-            nLog.innerHTML = `> <span class="loading-dots">Mengunggah tensor gambar</span>`;
+            nLog.innerHTML = `> <span class="loading-dots text-[10px]">Mengunggah tensor gambar</span>`;
             await sleep(1500);
 
-            // TAHAP 2: NEURAL EXTRACTION (2.5 detik)
-            nLog.innerHTML = `> <span class="loading-dots">Ekstraksi fitur ResNet-34</span>`;
+            nLog.innerHTML = `> <span class="loading-dots text-[10px]">Ekstraksi fitur ResNet-34</span>`;
             document.querySelectorAll('#n-layer-1 circle').forEach((c, i) => {
                 setTimeout(() => c.setAttribute('fill', '#10b981'), i * 150);
             });
             await sleep(2500);
             
-            // TAHAP 3: CBAM ATTENTION (2.5 detik)
             document.getElementById('cbam-overlay').classList.remove('opacity-0');
-            nLog.innerHTML = `> <span class="loading-dots">CBAM Attention: Mencari bintik lesi</span>`;
+            nLog.innerHTML = `> <span class="loading-dots text-[10px]">CBAM Attention: Mencari bintik lesi</span>`;
             document.querySelectorAll('#n-layer-2 circle').forEach((c, i) => {
                 setTimeout(() => c.setAttribute('fill', '#10b981'), i * 150);
             });
             await sleep(2500);
             
-            nLog.innerHTML = `> <span class="text-white font-bold">PERSEPSI: ${data.perception}</span>`;
+            nLog.innerHTML = `> <span class="text-white font-bold text-[10px]">PERSEPSI: ${data.perception}</span>`;
             document.querySelectorAll('#n-layer-3 circle').forEach(c => c.setAttribute('fill', '#fbbf24'));
 
-            // TAHAP 4: SYMBOLIC REASONING (3 detik)
             sLog.innerHTML = `> Bukti diterima.<br><span class="loading-dots">Menelusuri Knowledge Graph pakar</span>`;
             await sleep(2000);
             
@@ -287,16 +291,15 @@
             document.getElementById('node-disease').classList.add('active-logic');
             sLog.innerHTML += `<br>> <span class="text-emerald-400 font-bold">SUCCESS: Rule Aligned.</span>`;
 
-            // TAHAP 5: FINAL AUDIT (2 detik)
             await sleep(1500);
             statusTag.innerText = "STATUS: LIVE";
-            statusTag.className = "px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-mono";
+            statusTag.className = "px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-mono";
             
             triage.classList.remove('grayscale', 'opacity-40', 'scale-95');
             document.getElementById('audit-status').innerText = `STATUS: ${data.status}`;
-            document.getElementById('audit-status').className = "text-xs font-black tracking-widest text-emerald-500 mb-2";
+            document.getElementById('audit-status').className = "text-[9px] font-black tracking-widest text-emerald-500 mb-1";
             document.getElementById('audit-icon').innerText = "✅";
-            document.getElementById('audit-icon').className = "w-20 h-20 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500 text-3xl border border-emerald-500/50";
+            document.getElementById('audit-icon').className = "w-16 h-16 rounded-full flex items-center justify-center bg-emerald-500/20 text-emerald-500 text-2xl border border-emerald-500/50";
             
             document.getElementById('final-diagnosis').innerText = data.diagnosis;
             document.getElementById('conf-val').innerText = (data.conf * 100).toFixed(1) + "%";
