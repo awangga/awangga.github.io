@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mamba AI vs Transformer - Panduan Interaktif</title>
+    <!-- Tailwind CSS untuk Desain Premium -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons untuk Grafis -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden flex flex-col">
+
+    <!-- Header / Navigasi -->
+    <header class="border-b border-slate-800 bg-slate-900/80 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-amber-500/10 rounded-lg border border-amber-500/30 text-amber-400">
+                    <i data-lucide="zap" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-500 bg-clip-text text-transparent">
+                        Mamba: Arsitektur AI Berbasis State Space
+                    </h1>
+                    <p class="text-[10px] text-slate-400">Generasi Baru Pengolah Bahasa Pengganti Transformer</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800 text-[10px]">
+                <span class="text-slate-500 font-bold">KONSEP UTAMA:</span>
+                <span class="text-amber-400 font-mono">SELECTIVE SSM (S6)</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- ================= PANEL UTAMA: AKSELERATOR SIMULATOR TOKENS (lg:col-span-8) ================= -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- Area Simulasi Pemrosesan Kata -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4 glow-amber">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Simulasi Pemrosesan Informasi Secara Real-Time</h2>
+                        <p class="text-[11px] text-slate-400">Bandingkan bagaimana Mamba dan Transformer membaca kalimat yang panjang.</p>
+                    </div>
+                    <button onclick="startSimulation()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1 transition-all">
+                        <i data-lucide="play" class="w-3.5 h-3.5"></i> Mulai Simulasi
+                    </button>
+                </div>
+
+                <!-- Input Kalimat Uji Coba -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Pilih atau Tulis Kalimat Masukan (Input Tokens)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="input-sentence" value="Mamba adalah model AI berbasis State Space yang sangat cepat dan ringan." class="flex-grow bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50">
+                        <button onclick="resetSim()" class="px-3 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg border border-slate-700">Atur Ulang</button>
+                    </div>
+                </div>
+
+                <!-- Simulator Pemrosesan Kata -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    
+                    <!-- Sisi Kiri: Transformer (KV Cache Kuadratik) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                            <span class="text-xs font-bold text-sky-400 flex items-center gap-1">
+                                <i data-lucide="blocks" class="w-3.5 h-3.5"></i> TRANSFORMER (Attention)
+                            </span>
+                            <span class="text-[9px] code-font text-sky-400 bg-sky-400/10 px-1.5 py-0.5 rounded">Kompleksitas: O(N²)</span>
+                        </div>
+                        
+                        <!-- Visualisasi Memori Transformer -->
+                        <div class="h-32 bg-slate-900/50 rounded-lg p-2.5 flex flex-col gap-1.5 relative overflow-hidden">
+                            <div class="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Matriks Perhatian (KV Cache Memory)</div>
+                            <div id="transformer-attention-grid" class="grid grid-cols-8 gap-1 flex-grow">
+                                <!-- Grid perhatian akan digambar lewat JS -->
+                            </div>
+                            <div class="absolute bottom-1 right-2 text-[9px] text-sky-400 font-mono" id="transformer-ram">RAM: 0 KB</div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 leading-relaxed">
+                            Transformer harus menyimpan dan membandingkan <strong>setiap kata baru dengan seluruh kata sebelumnya</strong> secara berulang-ulang. Memori membengkak secara kuadratik seiring panjangnya teks.
+                        </p>
+                    </div>
+
+                    <!-- Sisi Kanan: MAMBA (Selective State Space) -->
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                            <span class="text-xs font-bold text-amber-400 flex items-center gap-1">
+                                <i data-lucide="zap" class="w-3.5 h-3.5"></i> MAMBA (State Space)
+                            </span>
+                            <span class="text-[9px] code-font text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded">Kompleksitas: O(N)</span>
+                        </div>
+
+                        <!-- Visualisasi Memori Mamba -->
+                        <div class="h-32 bg-slate-900/50 rounded-lg p-2.5 flex flex-col justify-between relative overflow-hidden">
+                            <div class="text-[9px] text-slate-500 uppercase tracking-wider">Vektor Keadaan Tersembunyi (Hidden State h<sub>t</sub>)</div>
+                            
+                            <!-- Tabung Kompresi State -->
+                            <div class="flex items-center justify-center gap-2 py-2">
+                                <div class="w-full bg-slate-850 h-5 rounded-full border border-slate-700 relative overflow-hidden flex items-center">
+                                    <div id="mamba-state-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 h-full w-0 transition-all duration-300"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center text-[9px] font-mono text-slate-300 font-bold" id="mamba-state-val">UKURAN STATE: TETAP (100% Kompresi)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-[9px] text-slate-400 text-center" id="mamba-action-text">Menunggu masukan kata...</div>
+                            <div class="absolute bottom-1 right-2 text-[9px] text-amber-400 font-mono" id="mamba-ram">RAM: 0 KB</div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 leading-relaxed">
+                            Mamba memampatkan seluruh konteks sebelumnya ke dalam <strong>satu Vektor Keadaan tersembunyi (Hidden State) berukuran tetap</strong>. Informasi baru diserap secara linier tanpa membengkakkan RAM.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Monitor Pemrosesan Kata (Output Display) -->
+                <div class="mt-2 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Kata yang Sedang Diproses (Token Stream)</span>
+                    <div id="token-stream-display" class="flex flex-wrap gap-1.5 mt-1.5 min-h-[40px] items-center">
+                        <!-- Token dimasukkan lewat JS -->
+                        <span class="text-xs text-slate-500 italic">Tekan "Mulai Simulasi" untuk melihat aliran kata...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= FORMULA MATEMATIKA: BAGAIMANA SSM BEKERJA DI MAMBA ================= -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-200">Bagaimana Rumus State Space Bekerja di Mamba?</h3>
+                    <p class="text-xs text-slate-400">Mamba mengadaptasi rumus fisika ruang keadaan pesawat ke dalam bentuk diskrit yang selektif.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Langkah 1: Persamaan Kontinu -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
+                        <span class="text-[10px] font-bold text-rose-400 uppercase">1. Persamaan Kontinu (Fisika)</span>
+                        <div class="bg-slate-950 py-2.5 px-3 rounded-lg text-center font-mono text-xs text-rose-300 border border-rose-900/30">
+                            h'(t) = A · h(t) + B · x(t)
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Sama persis seperti kemudi pesawat! Keadaan memori internal (<span class="math-var">h</span>) berubah dipengaruhi oleh memori lama (<span class="math-var">A</span>) dan kata masukan baru (<span class="math-var">x</span>) melalui pengali <span class="math-var">B</span>.
+                        </p>
+                    </div>
+
+                    <!-- Langkah 2: Diskretisasi -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
+                        <span class="text-[10px] font-bold text-sky-400 uppercase">2. Diskretisasi (Komputerisasi)</span>
+                        <div class="bg-slate-950 py-2.5 px-3 rounded-lg text-center font-mono text-xs text-sky-300 border border-sky-900/30">
+                            h<sub>t</sub> = Ā · h<sub>t-1</sub> + B̄ · x<sub>t</sub>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Karena komputer bekerja dengan unit terpisah (kata demi kata/token), rumus kontinu diubah menjadi diskrit menggunakan parameter langkah waktu <span class="math-var">Δ</span> (Delta) untuk menghasilkan matriks digital <span class="math-var">Ā</span> dan <span class="math-var">B̄</span>.
+                        </p>
+                    </div>
+
+                    <!-- Langkah 3: Mekanisme Seleksi -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
+                        <span class="text-[10px] font-bold text-amber-400 uppercase">3. Mekanisme Selektif (Mamba)</span>
+                        <div class="bg-slate-950 py-2.5 px-3 rounded-lg text-center font-mono text-xs text-amber-300 border border-amber-900/30">
+                            B<sub>t</sub>, C<sub>t</sub>, Δ<sub>t</sub> = f(x<sub>t</sub>)
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            Inilah terobosan utama Mamba! Matriks <span class="math-var">B</span>, <span class="math-var">C</span>, dan <span class="math-var">Δ</span> <strong>tidak statis</strong>, melainkan terus berubah secara dinamis tergantung pada kata (<span class="math-var">x<sub>t</sub></span>) yang sedang dibaca.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tombol Interaktif untuk Menjelaskan Seleksi -->
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 text-amber-400 font-bold text-xs mb-1.5">
+                        <i data-lucide="help-circle" class="w-4 h-4"></i>
+                        <span>Apa arti "Selektif" pada Mamba?</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Pada SSM biasa, sistem merekam segala hal tanpa menyaring (seperti merekam semua getaran angin pada pesawat). Mamba memiliki kemampuan <strong>menyaring informasi</strong>. Jika membaca kata yang tidak penting (seperti "dan", "yang"), Mamba memperbesar <span class="math-var">Δ</span> agar memori lamanya cepat pudar. Jika membaca kata kunci penting (seperti nama atau fakta), Mamba mengecilkan <span class="math-var">Δ</span> agar informasi tersebut tersimpan kuat di dalam Vektor Keadaan (<span class="math-var">h<sub>t</sub></span>).
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= PANEL KANAN: STATISTIK & REVOLUSI MEMORI (lg:col-span-4) ================= -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Grafik Interaktif Kompleksitas (Skala Panjang Konteks) -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Efisiensi Memori (Panjang Konteks)</h3>
+                    <span class="text-[9px] code-font text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">O(N) vs O(N²)</span>
+                </div>
+
+                <!-- Visualisasi Slider Panjang Konteks -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between text-[10px]">
+                        <span class="text-slate-400">Panjang Teks (Jumlah Kata):</span>
+                        <span id="slider-words-val" class="text-amber-400 font-mono font-bold">10,000 Kata</span>
+                    </div>
+                    <input type="range" id="context-slider" min="1000" max="100000" step="1000" value="10000" class="h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400" oninput="updateContextComparison(this.value)">
+                </div>
+
+                <!-- Perbandingan RAM -->
+                <div class="flex flex-col gap-2 mt-2">
+                    <!-- Bar Transformer -->
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-[10px] code-font">
+                            <span class="text-sky-400">Transformer (Attention RAM):</span>
+                            <span id="ram-transformer-val" class="text-sky-300 font-bold">10.00 GB</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div id="ram-bar-transformer" class="bg-sky-400 h-full transition-all duration-300" style="width: 10%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bar Mamba -->
+                    <div class="flex flex-col gap-1 mt-2">
+                        <div class="flex justify-between text-[10px] code-font">
+                            <span class="text-amber-400">Mamba (State Space RAM):</span>
+                            <span id="ram-mamba-val" class="text-amber-300 font-bold">0.01 GB</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+                            <div id="ram-bar-mamba" class="bg-amber-400 h-full transition-all duration-300" style="width: 1%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-slate-400 bg-slate-900/50 p-3 rounded-lg border border-slate-800 leading-relaxed">
+                    <span class="font-bold text-slate-300">Dampak Nyata:</span><br>
+                    Ketika teks masukan bertambah panjang (misal 1 buku penuh), Transformer akan mengalami <strong>out-of-memory (OOM)</strong> karena memori melesat secara kuadratik. Sementara Mamba stabil menggunakan memori yang kecil dan konstan secara linier.
+                </div>
+            </div>
+
+            <!-- Mengapa Mamba Menantang Transformer? -->
+            <div class="glass-panel rounded-2xl p-5 flex flex-col gap-3">
+                <div class="flex items-center gap-2 text-amber-400">
+                    <i data-lucide="swatch-book" class="w-4.5 h-4.5"></i>
+                    <h3 class="text-xs font-bold uppercase tracking-wider">Kelebihan Mamba dibanding GPT</h3>
+                </div>
+                
+                <div class="flex flex-col gap-2.5 text-xs">
+                    <div class="flex gap-2">
+                        <div class="text-amber-400 font-bold">1.</div>
+                        <div>
+                            <strong class="text-slate-200">Kecepatan Output Tanpa Lag:</strong><br>
+                            Saat men-generate teks panjang, GPT akan melambat di setiap kata baru. Mamba memiliki kecepatan generate yang stabil dari awal hingga akhir kata.
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="text-amber-400 font-bold">2.</div>
+                        <div>
+                            <strong class="text-slate-200">Konteks Tak Terbatas:</strong><br>
+                            Anda bisa memasukkan ribuan halaman dokumen sekaligus tanpa takut memori komputer habis atau membengkak.
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="text-amber-400 font-bold">3.</div>
+                        <div>
+                            <strong class="text-slate-200">Sinergi Hardware Optimal:</strong><br>
+                            Mamba didesain menggunakan algoritma *Parallel Scan* yang mengeksploitasi kecepatan memori GPU SRAM, membuatnya jauh lebih cepat dilatih.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kesimpulan Peraga -->
+            <div class="bg-gradient-to-br from-amber-950/20 to-slate-900/60 rounded-2xl p-4 border border-amber-500/20 text-xs text-slate-300 leading-relaxed">
+                <strong>Ingat Poin Ini Untuk Mengajar:</strong><br>
+                Mamba adalah bukti nyata bahwa teori kendali matematika klasik (seperti <em>State Space Model</em> pesawat terbang tahun 1960-an) dapat dimodifikasi secara modern untuk melompati arsitektur AI tercanggih saat ini.
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-900 bg-slate-950 py-3 text-center text-[10px] text-slate-600">
+        <p>© 2026 Modul Pembelajaran Interaktif Mamba AI & State Space Models</p>
+    </footer>
+
+    <!-- SCRIPT UTAMA KONTROL SIMULASI -->
+    <script>
+        // Inisialisasi ikon Lucide
+        lucide.createIcons();
+
+        // Data Simulasi Kata
+        let intervalId = null;
+        let isSimulating = false;
+        let currentTokenIndex = 0;
+        let tokens = [];
+
+        function startSimulation() {
+            if (isSimulating) return;
+            isSimulating = true;
+            
+            const textInput = document.getElementById('input-sentence').value;
+            tokens = textInput.split(" ");
+            currentTokenIndex = 0;
+
+            const streamDisplay = document.getElementById('token-stream-display');
+            streamDisplay.innerHTML = ""; // Bersihkan tampilan lama
+
+            const attentionGrid = document.getElementById('transformer-attention-grid');
+            attentionGrid.innerHTML = ""; // Bersihkan grid perhatian
+
+            // Reset RAM dan State
+            updateRAMVisual(0);
+
+            // Jalankan loop pemrosesan kata per kata
+            intervalId = setInterval(processNextToken, 450);
+        }
+
+        function processNextToken() {
+            if (currentTokenIndex >= tokens.length) {
+                clearInterval(intervalId);
+                isSimulating = false;
+                document.getElementById('mamba-action-text').innerHTML = "<span class='text-emerald-400 font-bold'>✓ Pemrosesan Selesai!</span>";
+                return;
+            }
+
+            const currentToken = tokens[currentTokenIndex];
+            const streamDisplay = document.getElementById('token-stream-display');
+
+            // 1. Tambahkan kata ke layar stream
+            const tokenSpan = document.createElement('span');
+            tokenSpan.className = "px-2 py-1 rounded bg-amber-500 text-slate-950 text-xs font-bold font-mono border border-amber-400 animate-pulse";
+            tokenSpan.innerText = currentToken;
+            streamDisplay.appendChild(tokenSpan);
+
+            // Matikan kedipan kata sebelumnya
+            if (streamDisplay.children.length > 1) {
+                streamDisplay.children[streamDisplay.children.length - 2].className = "px-2 py-1 rounded bg-slate-900 text-slate-300 text-xs font-mono border border-slate-800";
+            }
+
+            // 2. Simulasi Update Memori Transformer (Attention Matrix)
+            const attentionGrid = document.getElementById('transformer-attention-grid');
+            // Menambahkan node-node hubungan perhatian yang bertambah secara kuadratik
+            const activeNodesCount = (currentTokenIndex + 1) * (currentTokenIndex + 1);
+            attentionGrid.innerHTML = "";
+            for (let i = 0; i < 64; i++) {
+                const dot = document.createElement('div');
+                if (i < activeNodesCount) {
+                    dot.className = "w-full h-3 rounded-sm bg-sky-500 opacity-80 border border-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.4)] animate-ping-once";
+                } else {
+                    dot.className = "w-full h-3 rounded-sm bg-slate-950 border border-slate-900";
+                }
+                attentionGrid.appendChild(dot);
+            }
+
+            // 3. Simulasi Mamba (State Space Matrix update)
+            const mambaBar = document.getElementById('mamba-state-bar');
+            // Mamba hanya menjaga kompresi konstan, tapi visualisasinya menunjukkan pengisian dinamis yang stabil
+            const progress = ((currentTokenIndex + 1) / tokens.length) * 100;
+            mambaBar.style.width = "100%"; // Ukuran state tetap selalu penuh (100% kompresi konstan)
+
+            const mambaActionText = document.getElementById('mamba-action-text');
+            // Simulasi filter selektif Mamba
+            const isStopWord = ["adalah", "yang", "dan", "di", "dengan", "ke"].includes(currentToken.toLowerCase());
+            if (isStopWord) {
+                mambaActionText.innerHTML = `Membaca <span class="text-orange-400">"${currentToken}"</span> (Kata tugas): <span class="text-slate-400">Langkah Δ diperbesar (Diabaikan)</span>`;
+                mambaBar.className = "bg-gradient-to-r from-slate-600 to-slate-700 h-full w-full transition-all duration-300";
+            } else {
+                mambaActionText.innerHTML = `Membaca <span class="text-amber-400 font-bold">"${currentToken}"</span> (Kata Kunci): <span class="text-emerald-400">Langkah Δ diperkecil (Disimpan ke Keadaan h<sub>t</sub>)</span>`;
+                mambaBar.className = "bg-gradient-to-r from-amber-500 to-orange-500 h-full w-full transition-all duration-300";
+            }
+
+            // 4. Update Angka Konsumsi RAM secara simulasi
+            updateRAMVisual(currentTokenIndex + 1);
+
+            currentTokenIndex++;
+        }
+
+        function updateRAMVisual(step) {
+            // Skala RAM Transformer: Kuadratik (N^2)
+            const transformerKB = Math.round(step * step * 12.5);
+            // Skala RAM Mamba: Linier (N)
+            const mambaKB = Math.round(step * 4);
+
+            document.getElementById('transformer-ram').innerText = `RAM KV-Cache: ${transformerKB} KB`;
+            document.getElementById('mamba-ram').innerText = `RAM State: ${mambaKB} KB`;
+        }
+
+        function resetSim() {
+            clearInterval(intervalId);
+            isSimulating = false;
+            currentTokenIndex = 0;
+            document.getElementById('token-stream-display').innerHTML = `<span class="text-xs text-slate-500 italic">Tekan "Mulai Simulasi" untuk melihat aliran kata...</span>`;
+            document.getElementById('transformer-attention-grid').innerHTML = "";
+            document.getElementById('mamba-state-bar').style.width = "0%";
+            document.getElementById('mamba-action-text').innerText = "Menunggu masukan kata...";
+            document.getElementById('transformer-ram').innerText = "RAM: 0 KB";
+            document.getElementById('mamba-ram').innerText = "RAM: 0 KB";
+        }
+
+
+        // --- KONTROL DETAIL COMPARISON SLIDER (RAM VS CONTEXT LENGTH) ---
+        function updateContextComparison(value) {
+            const words = parseInt(value);
+            document.getElementById('slider-words-val').innerText = `${words.toLocaleString('id-ID')} Kata`;
+
+            // Transformer RAM (Kuadratik O(N^2))
+            // Anggap 10,000 kata membutuhkan sekitar 10 GB pada model Transformer standar
+            const transformerRAM_GB = (words * words) / 10000000;
+            const transformerDisplay = transformerRAM_GB > 100 ? `${(transformerRAM_GB / 1000).toFixed(1)} TB` : `${transformerRAM_GB.toFixed(2)} GB`;
+
+            // Mamba RAM (Linier O(N))
+            // Mamba hanya butuh ukuran state yang konstan (sangat amat kecil, misal hanya beberapa puluh megabyte saja)
+            const mambaRAM_GB = 0.05 + (words / 1000000); 
+            const mambaDisplay = `${mambaRAM_GB.toFixed(3)} GB`;
+
+            document.getElementById('ram-transformer-val').innerText = transformerDisplay;
+            document.getElementById('ram-mamba-val').innerText = mambaDisplay;
+
+            // Update Panjang Bar Grafik
+            const transBarPercent = Math.min(100, (transformerRAM_GB / 100) * 100);
+            const mambaBarPercent = Math.min(100, (mambaRAM_GB / 100) * 100 + 1); // +1 biar tidak terlihat mati total
+
+            document.getElementById('ram-bar-transformer').style.width = `${transBarPercent}%`;
+            document.getElementById('ram-bar-mamba').style.width = `${mambaBarPercent}%`;
+
+            if (transformerRAM_GB > 100) {
+                document.getElementById('ram-transformer-val').innerHTML = `${transformerDisplay} <span class="text-rose-500 font-bold uppercase animate-pulse">(CRASH / OOM!)</span>`;
+            }
+        }
+
+        // Jalankan kalkulasi perbandingan awal sekali
+        updateContextComparison(10000);
+    </script>
+</body>
+</html>
