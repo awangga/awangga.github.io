@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualisasi State Space - Fly by Wire</title>
+    <!-- Tailwind CSS untuk Desain Modern & Responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons untuk Icon Grafis yang Menarik -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Efek glassmorphism modern */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        /* Gaya Khusus untuk Penulisan Rumus Matematika tanpa LaTeX */
+        .math-var {
+            font-family: 'JetBrains Mono', monospace;
+            font-style: italic;
+            font-weight: 600;
+        }
+        .math-symbol {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-style: normal;
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden flex flex-col">
+
+    <!-- Header / Navigasi Atas -->
+    <header class="border-b border-slate-800 bg-slate-900/80 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-sky-500/10 rounded-lg border border-sky-500/30 text-sky-400">
+                    <i data-lucide="plane" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-sky-400 via-teal-200 to-indigo-400 bg-clip-text text-transparent">
+                        State Space Model & Fly-By-Wire
+                    </h1>
+                    <p class="text-[10px] text-slate-400">Simulator & Alat Peraga Pembelajaran Interaktif</p>
+                </div>
+            </div>
+            
+            <!-- Indikator Status Penerbangan -->
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800">
+                <span class="text-[10px] font-semibold text-slate-500 uppercase">SISTEM:</span>
+                <span id="header-fbw-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    FBW AKTIF (STABIL)
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- ================= PANEL KIRI: SIMULATOR UTAMA (lg:col-span-8) ================= -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <!-- Area Dashboard Visualisasi Penerbangan -->
+            <div class="glass-panel rounded-2xl overflow-hidden relative flex flex-col glow-blue">
+                <div class="h-80 sm:h-96 w-full relative bg-slate-900 overflow-hidden">
+                    <!-- Grid Angin Bergerak -->
+                    <div id="particle-grid" class="absolute inset-0 opacity-10 pointer-events-none"></div>
+                    
+                    <!-- Lapisan HUD (Head Up Display) -->
+                    <div class="absolute inset-0 pointer-events-none border border-sky-500/5 flex items-center justify-center">
+                        <div class="w-16 h-16 border border-sky-500/10 rounded-full flex items-center justify-center">
+                            <div class="w-1.5 h-1.5 bg-sky-400/50 rounded-full"></div>
+                        </div>
+                        
+                        <!-- Garis Tangga Derajat (Pitch Ladder) -->
+                        <div class="absolute text-[9px] text-sky-400/40 code-font flex flex-col gap-8 items-center">
+                            <div>-- 10° --</div>
+                            <div>-- 05° --</div>
+                            <div class="text-sky-400/80 font-bold">-[ 00° ]-</div>
+                            <div>-- -05° --</div>
+                            <div>-- -10° --</div>
+                        </div>
+                    </div>
+
+                    <!-- Representasi Pesawat SVG -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <svg id="airplane-svg" class="w-72 h-72 sm:w-96 sm:h-96 transition-transform duration-75 ease-out" viewBox="0 0 400 400" style="transform: rotate(0deg);">
+                            <!-- Garis Horizon Referensi -->
+                            <line x1="50" y1="200" x2="350" y2="200" stroke="#334155" stroke-dasharray="4 4" stroke-width="1.5" />
+                            
+                            <!-- Indikator Sudut Pitch Pesawat saat ini -->
+                            <g id="pitch-angle-indicator" class="opacity-30">
+                                <line x1="100" y1="200" x2="300" y2="200" stroke="#06b6d4" stroke-width="2" />
+                                <text x="310" y="205" fill="#06b6d4" class="text-[11px] code-font font-bold">θ (Pitch)</text>
+                            </g>
+
+                            <!-- Kerangka Utama Pesawat (Fuselaj & Sayap) -->
+                            <g id="airplane-body">
+                                <!-- Efek Api Jet -->
+                                <path id="jet-flame" d="M 60,200 L 40,196 L 45,200 L 40,204 Z" fill="#f97316" class="opacity-90" />
+                                <!-- Sayap Belakang -->
+                                <path d="M 90,195 L 110,185 L 120,185 L 105,200 Z" fill="#94a3b8" />
+                                <!-- Sirip Tegak Belakang (Rudder Base) -->
+                                <path d="M 100,195 L 85,160 L 105,160 L 120,195 Z" fill="#64748b" />
+                                <!-- Sayap Utama Delta -->
+                                <path d="M 170,200 L 210,205 L 180,225 L 160,200 Z" fill="#cbd5e1" />
+                                <!-- Badan Utama Pesawat -->
+                                <path d="M 80,200 C 120,195 240,190 320,198 C 340,200 350,202 330,204 C 280,208 120,208 80,200" fill="#cbd5e1" stroke="#475569" stroke-width="2" />
+                                <!-- Kokpit kaca transparan -->
+                                <path d="M 240,194 C 255,182 275,182 285,194 Z" fill="#38bdf8" opacity="0.6" />
+                                
+                                <!-- ELEVATOR KENDALI (Bergerak dinamis menuruti nilai u) -->
+                                <g id="elevator-group" transform="translate(92, 198)">
+                                    <path id="elevator-surface" d="M 0,-3 L -20,-1 L -20,1 L 0,1 Z" fill="#f43f5e" stroke="#be123c" stroke-width="1" />
+                                    <!-- Label Input Kemudi (u) -->
+                                    <text x="-42" y="-12" fill="#f43f5e" class="text-[10px] code-font font-bold">u (Kemudi)</text>
+                                    <!-- Tanda Gaya Angkat akibat Elevator -->
+                                    <line id="force-arrow" x1="-10" y1="0" x2="-10" y2="-25" stroke="#f43f5e" stroke-width="2.5" marker-end="url(#arrow)" />
+                                </g>
+                            </g>
+
+                            <!-- Marker panah -->
+                            <defs>
+                                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f43f5e"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- Overlay Box: Pembacaan Vektor Keadaan Real-time (Sangat Berfungsi!) -->
+                    <div class="absolute bottom-3 left-3 right-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- Vektor Keadaan x -->
+                        <div class="bg-slate-950/85 p-2 rounded-lg border border-slate-800 text-[11px] code-font flex flex-col gap-1">
+                            <div class="text-slate-400 font-bold border-b border-slate-800 pb-1 flex justify-between">
+                                <span>VEKTOR KEADAAN</span>
+                                <span class="text-cyan-400 font-mono">x(t)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Pitch Angle (<span class="math-var text-cyan-400">x<sub>1</sub> = θ</span>):</span>
+                                <span id="val-pitch-text" class="text-cyan-400 font-bold">0.00°</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Pitch Rate (<span class="math-var text-emerald-400">x<sub>2</sub> = q</span>):</span>
+                                <span id="val-pitchrate-text" class="text-emerald-400 font-bold">0.00°/s</span>
+                            </div>
+                        </div>
+
+                        <!-- Laju Perubahan ẋ dan Input u -->
+                        <div class="bg-slate-950/85 p-2 rounded-lg border border-slate-800 text-[11px] code-font flex flex-col gap-1">
+                            <div class="text-slate-400 font-bold border-b border-slate-800 pb-1 flex justify-between">
+                                <span>LAJU PERUBAHAN & INPUT</span>
+                                <span class="text-rose-400 font-mono">ẋ(t) & u(t)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Laju Pitch (<span class="math-var text-rose-400">ẋ<sub>2</sub> = q̇</span>):</span>
+                                <span id="val-xdot-text" class="text-rose-400 font-bold">0.00°/s²</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Input Pilot (<span class="math-var text-orange-400">u</span>):</span>
+                                <span id="val-u-text" class="text-orange-400 font-bold">0.00°</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overlay Layar saat Pesawat Jatuh / Tidak Stabil -->
+                    <div id="crash-alert" class="hidden absolute inset-0 bg-red-950/90 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4 z-20">
+                        <div class="p-3 bg-red-500/20 text-red-500 rounded-full border border-red-500/40 mb-2 animate-bounce">
+                            <i data-lucide="triangle-alert" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-red-400 uppercase tracking-wide">Pesawat Tidak Stabil (Crash!)</h3>
+                        <p class="text-xs text-slate-300 max-w-sm mt-1 mb-4">
+                            Tanpa komputer FBW, aerodinamika pesawat tempur modern ini bersifat tidak stabil. Gangguan kecil berlipat ganda dengan cepat (keadaan <span class="math-var">ẋ</span> tumbuh secara eksponensial) hingga lepas kendali.
+                        </p>
+                        <button onclick="resetAircraft(true)" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1.5 transition-all">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Aktifkan FBW & Atur Ulang
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bagian Kontrol Bawah Dashboard -->
+                <div class="p-4 sm:p-6 border-t border-slate-800 bg-slate-900/40 grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+                    <!-- Toggle Sistem Kendali -->
+                    <div class="md:col-span-5 flex flex-col justify-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Sistem Stabilisasi Terbang</label>
+                        <button id="fbw-toggle" onclick="toggleFBW()" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/30 glow-green">
+                            <i data-lucide="shield" id="fbw-icon" class="w-4 h-4"></i>
+                            <span id="fbw-label">FLY-BY-WIRE: AKTIF</span>
+                        </button>
+                        <p class="text-[10px] text-slate-500 mt-2">
+                            *FBW menggunakan matriks umpan balik <span class="math-var text-teal-400 font-bold">K</span> untuk memodifikasi matriks kestabilan <span class="math-var text-purple-400 font-bold">A</span> pesawat secara otomatis.
+                        </p>
+                    </div>
+
+                    <!-- Slider Pengendalian Manual Pilot -->
+                    <div class="md:col-span-7 flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tuas Kemudi Pilot (<span class="math-var text-orange-400">u</span> - Pitch Command)</label>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-sky-400" id="joy-val">0.00 (Netral)</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] text-rose-400 font-bold">PITCH DOWN</span>
+                            <input type="range" id="joystick-slider" min="-10" max="10" step="0.1" value="0" class="flex-grow h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400" oninput="updateJoystickSlider(this.value)">
+                            <span class="text-[10px] text-emerald-400 font-bold">PITCH UP</span>
+                        </div>
+                        <div class="flex justify-between mt-3 gap-2">
+                            <button onclick="giveNudge()" class="py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 rounded-lg border border-slate-700 flex items-center gap-1 transition-all">
+                                <i data-lucide="wind" class="w-3 h-3"></i> Beri Turbulensi (Hembusan Angin)
+                            </button>
+                            <button onclick="resetAircraft(false)" class="py-1 px-2.5 bg-slate-800/40 hover:bg-slate-800 text-[10px] text-slate-400 rounded-lg border border-slate-800 transition-all">
+                                Atur Ulang Posisi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= INTERACTIVE EQUATION EXPLORER (RUMUS DIRENTANGKAN INDAH) ================= -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4">
+                <div>
+                    <h3 class="text-base font-bold text-slate-200">Interactive State Space Explorer</h3>
+                    <p class="text-xs text-slate-400">Klik komponen rumus di bawah untuk membedah maknanya secara visual.</p>
+                </div>
+
+                <!-- Rumus Murni Menggunakan Tag HTML Khas untuk Tampilan Sempurna -->
+                <div class="bg-slate-950 p-4 sm:p-5 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-5 items-center justify-center text-center overflow-x-auto">
+                    <!-- Persamaan Keadaan (State Equation) -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Persamaan Keadaan Pesawat</div>
+                        <div class="flex items-center gap-1.5 text-base sm:text-lg font-mono select-none">
+                            <span onclick="exploreVariable('xdot')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-rose-500/10 hover:bg-rose-500/30 border border-rose-500/20 text-rose-400 font-bold">ẋ(t)</span>
+                            <span class="text-slate-400">=</span>
+                            <span onclick="exploreVariable('matrix-a')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-purple-500/10 hover:bg-purple-500/30 border border-purple-500/20 text-purple-400 font-bold">A</span>
+                            <span onclick="exploreVariable('state-x')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-cyan-500/10 hover:bg-cyan-500/30 border border-cyan-500/20 text-cyan-400 font-bold">x(t)</span>
+                            <span class="text-slate-400">+</span>
+                            <span onclick="exploreVariable('matrix-b')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-amber-500/10 hover:bg-amber-500/30 border border-amber-500/20 text-amber-400 font-bold">B</span>
+                            <span onclick="exploreVariable('input-u')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-orange-500/10 hover:bg-orange-500/30 border border-orange-500/20 text-orange-400 font-bold">u(t)</span>
+                        </div>
+                    </div>
+
+                    <!-- Pembatas Tengah -->
+                    <div class="hidden sm:block h-10 w-px bg-slate-800"></div>
+
+                    <!-- Persamaan Sensor Output (Output Equation) -->
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="text-[9px] uppercase font-bold text-slate-500 tracking-wider">Persamaan Pembacaan Sensor</div>
+                        <div class="flex items-center gap-1.5 text-base sm:text-lg font-mono select-none">
+                            <span onclick="exploreVariable('output-y')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-emerald-500/10 hover:bg-emerald-500/30 border border-emerald-500/20 text-emerald-400 font-bold">y(t)</span>
+                            <span class="text-slate-400">=</span>
+                            <span onclick="exploreVariable('matrix-c')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-indigo-500/10 hover:bg-indigo-500/30 border border-indigo-500/20 text-indigo-400 font-bold">C</span>
+                            <span onclick="exploreVariable('state-x')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-cyan-500/10 hover:bg-cyan-500/30 border border-cyan-500/20 text-cyan-400 font-bold">x(t)</span>
+                            <span class="text-slate-400">+</span>
+                            <span onclick="exploreVariable('matrix-d')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-gray-500/10 hover:bg-gray-500/30 border border-gray-500/20 text-gray-400 font-bold">D</span>
+                            <span onclick="exploreVariable('input-u')" class="px-2 py-1 rounded cursor-pointer transition-all duration-200 bg-orange-500/10 hover:bg-orange-500/30 border border-orange-500/20 text-orange-400 font-bold">u(t)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Penjelasan Variabel Interaktif -->
+                <div id="explanation-box" class="p-4 bg-slate-900 rounded-xl border border-slate-800 transition-all duration-300">
+                    <div class="flex items-center gap-2 text-sky-400 font-bold mb-2">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                        <span id="explanation-title" class="text-xs sm:text-sm">Klik salah satu kotak rumus di atas!</span>
+                    </div>
+                    <p id="explanation-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Pilih komponen matematika di atas untuk melihat penjelasannya serta nilai matriks fisika nyata yang sedang dihitung oleh simulator pesawat saat ini secara real-time.
+                    </p>
+                    <div id="explanation-extra" class="mt-3 hidden p-3 bg-slate-950 rounded border border-slate-800 font-mono text-xs text-slate-400">
+                        <!-- Nilai matriks dipasang oleh JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= PANEL KANAN: GRAFIK & INSTRUMEN (lg:col-span-4) ================= -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Horizon Buatan (Artificial Horizon Cockpit) -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Instrumen Horizon Buatan (PFD)</h3>
+                    <span class="text-[9px] code-font text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">LIVE</span>
+                </div>
+                
+                <div class="flex justify-center items-center py-2">
+                    <canvas id="pfd-canvas" width="160" height="160" class="rounded-full border-4 border-slate-700 bg-black shadow-lg"></canvas>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 text-center text-[10px] code-font">
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 uppercase">Pitch Angle (θ)</div>
+                        <div id="pfd-pitch-val" class="text-cyan-400 font-bold text-xs sm:text-sm">0.0°</div>
+                    </div>
+                    <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        <div class="text-slate-400 uppercase">Pitch Rate (q)</div>
+                        <div id="pfd-rate-val" class="text-emerald-400 font-bold text-xs sm:text-sm">0.0°/s</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oskiloskop Response Tracker -->
+            <div class="glass-panel rounded-2xl p-4 sm:p-6 flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Oskiloskop Respon Kestabilan</h3>
+                    <span class="text-[9px] code-font text-slate-500">Real-time</span>
+                </div>
+                
+                <div class="h-40 w-full bg-slate-950 rounded-xl border border-slate-800 overflow-hidden relative">
+                    <canvas id="scope-canvas" class="w-full h-full"></canvas>
+                    
+                    <!-- Keterangan Warna Legend -->
+                    <div class="absolute top-2 left-2 flex flex-col sm:flex-row gap-2 text-[9px] code-font bg-slate-950/80 p-1.5 rounded border border-slate-800">
+                        <span class="flex items-center gap-1 text-cyan-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block"></span> Pitch Angle (x<sub>1</sub>)
+                        </span>
+                        <span class="flex items-center gap-1 text-emerald-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> Pitch Rate (x<sub>2</sub>)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-slate-400 bg-slate-900/40 p-3 rounded-lg border border-slate-800 leading-relaxed">
+                    <span class="font-bold text-slate-200">Bagaimana Cara Membaca Grafik?</span><br>
+                    Ketika <strong>FBW Aktif</strong>, jika Anda mengganggu pesawat, garis grafik akan berosilasi sebentar lalu cepat kembali mendatar (menuju keseimbangan 0). Jika FBW dimatikan, garis akan langsung melonjak keluar layar.
+                </div>
+            </div>
+
+            <!-- Kartu Edukasi Singkat -->
+            <div class="bg-gradient-to-br from-indigo-950/40 to-slate-900/60 rounded-2xl p-5 border border-indigo-500/20 flex flex-col gap-2.5">
+                <div class="flex items-center gap-2 text-indigo-400">
+                    <i data-lucide="brain-circuit" class="w-4.5 h-4.5"></i>
+                    <h4 class="font-bold text-xs uppercase tracking-wider">Kesimpulan untuk Pengajaran</h4>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Sistem <strong>Fly-by-Wire</strong> memodifikasi sifat fisik pesawat secara digital. 
+                </p>
+                <p class="text-xs text-slate-300 leading-relaxed font-sans">
+                    Di dalam komputer FBW, terdapat perhitungan konstan matriks tertutup:
+                    <span class="block text-center text-teal-300 font-mono text-[10px] py-1 my-1.5 bg-slate-950 rounded border border-slate-800">A<sub>baru</sub> = A - B · K</span>
+                    Melalui umpan balik keadaan ini, sistem penerbangan yang tadinya tidak stabil (divergen) diubah menjadi sistem baru yang selalu kembali stabil secara otomatis.
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-900 bg-slate-950 py-3 text-center text-[10px] text-slate-600">
+        <p>© 2026 Dashboard Edukasi State Space & Fly-By-Wire</p>
+    </footer>
+
+    <!-- SCRIPT SIMULATOR DAN FISIKA MATEMATIKA -->
+    <script>
+        // Inisialisasi visual ikon
+        lucide.createIcons();
+
+        // --- MODEL RUANG KEADAAN (STATE SPACE MODEL) ---
+        // Vektor Keadaan: x = [pitch_angle, pitch_rate] -> (theta, q)
+        let x = [0.0, 0.0]; 
+        let x_dot = [0.0, 0.0];
+        let u = 0.0; // Perintah pilot (input kemudi)
+
+        // Matriks Kestabilan Fisik Alami Pesawat (A)
+        // Koefisien a21 bermutu positif (+1.5) mengindikasikan aerodinamika pesawat cenderung berputar balik tak terkontrol (Tidak Stabil)
+        const A_unstable = [
+            [0.0, 1.0],
+            [1.5, -0.2] 
+        ];
+
+        // Matriks Efektivitas Elevator (B)
+        const B = [0.0, 3.0];
+
+        // Matriks Feedback Gain (K) yang dipasang oleh Komputer FBW untuk menstabilkan sistem
+        const K_matrix = [2.5, 1.2];
+
+        // Indikator Operasi
+        let isFBWActive = true;
+        let isCrashed = false;
+
+        // Penanganan Input
+        const joystickSlider = document.getElementById('joystick-slider');
+        const joyValText = document.getElementById('joy-val');
+        const fbwToggleBtn = document.getElementById('fbw-toggle');
+        const fbwLabel = document.getElementById('fbw-label');
+        const fbwIcon = document.getElementById('fbw-icon');
+        const headerFbwBadge = document.getElementById('header-fbw-badge');
+        const crashAlert = document.getElementById('crash-alert');
+
+        // Penanganan Teks Pembacaan
+        const valPitchText = document.getElementById('val-pitch-text');
+        const valPitchRateText = document.getElementById('val-pitchrate-text');
+        const valXdotText = document.getElementById('val-xdot-text');
+        const valUText = document.getElementById('val-u-text');
+
+        // Penanganan Grafik Oskiloskop
+        const scopeCanvas = document.getElementById('scope-canvas');
+        const scopeCtx = scopeCanvas.getContext('2d');
+        let historyData = [];
+
+        // Penanganan PFD
+        const pfdCanvas = document.getElementById('pfd-canvas');
+        const pfdCtx = pfdCanvas.getContext('2d');
+
+        // Menyesuaikan ukuran canvas
+        function resizeCanvas() {
+            scopeCanvas.width = scopeCanvas.parentElement.clientWidth;
+            scopeCanvas.height = scopeCanvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- LOOP INTEGRASI PERSAMAAN DIFFERENSIAL (FISIKA SIMULASI) ---
+        const dt = 1/60; // Berjalan di 60 FPS
+
+        function physicsStep() {
+            if (isCrashed) return;
+
+            let u_eff = u; // Input kendali akhir yang dikirim ke elevator
+
+            if (isFBWActive) {
+                // Formula Fly-by-Wire State Feedback: u_akhir = u_pilot - (K1 * x1 + K2 * x2)
+                const feedbackValue = K_matrix[0] * x[0] + K_matrix[1] * x[1];
+                u_eff = u - feedbackValue;
+            }
+
+            // Integrasi Rumus State Space: x_dot = A * x + B * u
+            x_dot[0] = A_unstable[0][0] * x[0] + A_unstable[0][1] * x[1] + B[0] * u_eff;
+            x_dot[1] = A_unstable[1][0] * x[0] + A_unstable[1][1] * x[1] + B[1] * u_eff;
+
+            // Integrasi Euler sederhana untuk memperbarui Keadaan
+            x[0] += x_dot[0] * dt;
+            x[1] += x_dot[1] * dt;
+
+            // Jika sudut pitch pesawat terlalu ekstrem (> 50 derajat / ~0.87 Radian), dianggap jatuh/Crash
+            if (Math.abs(x[0]) > 0.87) {
+                isCrashed = true;
+                crashAlert.classList.remove('hidden');
+            }
+
+            // Simpan riwayat data
+            historyData.push({ theta: x[0], q: x[1] });
+            if (historyData.length > 200) historyData.shift();
+        }
+
+        // --- SISTEM NAVIGASI MANUAL & PILOT ---
+        function updateJoystickSlider(value) {
+            u = parseFloat(value) * 0.05; // Skala sudut kemudi
+            joyValText.innerText = value == 0 ? "0.00 (Netral)" : (value > 0 ? `+${parseFloat(value).toFixed(2)} (Pitch UP)` : `${parseFloat(value).toFixed(2)} (Pitch DOWN)`);
+        }
+
+        function toggleFBW() {
+            isFBWActive = !isFBWActive;
+            updateFBWUI();
+        }
+
+        function updateFBWUI() {
+            if (isFBWActive) {
+                fbwToggleBtn.className = "w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border transition-all cursor-pointer bg-emerald-500/10 text-emerald-400 border-emerald-500/30 glow-green";
+                fbwLabel.innerText = "FLY-BY-WIRE: AKTIF";
+                fbwIcon.setAttribute('data-lucide', 'shield');
+                headerFbwBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                headerFbwBadge.innerText = "FBW AKTIF (STABIL)";
+            } else {
+                fbwToggleBtn.className = "w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border transition-all cursor-pointer bg-rose-500/10 text-rose-400 border-rose-500/30 glow-red animate-pulse";
+                fbwLabel.innerText = "FLY-BY-WIRE: MATI";
+                fbwIcon.setAttribute('data-lucide', 'shield-off');
+                headerFbwBadge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                headerFbwBadge.innerText = "FBW MATI (TIDAK STABIL)";
+            }
+            lucide.createIcons();
+            if (activeExplorationVar) exploreVariable(activeExplorationVar);
+        }
+
+        function giveNudge() {
+            // Beri dorongan acak ke pitch rate (mensimulasikan hembusan angin turbulensi)
+            x[1] += (Math.random() > 0.5 ? 1 : -1) * 0.35;
+        }
+
+        function resetAircraft(activateFBW = false) {
+            x = [0.0, 0.0];
+            x_dot = [0.0, 0.0];
+            u = 0.0;
+            joystickSlider.value = 0;
+            updateJoystickSlider(0);
+            isCrashed = false;
+            crashAlert.classList.add('hidden');
+            if (activateFBW) {
+                isFBWActive = true;
+                updateFBWUI();
+            }
+        }
+
+        // --- SISTEM RENDERING VISUAL & ANIMASI ---
+
+        // Grid Angin Belakang
+        let gridOffset = 0;
+        function drawWindGrid() {
+            const grid = document.getElementById('particle-grid');
+            gridOffset -= 2 + Math.abs(x[1] * 4);
+            if (gridOffset < -40) gridOffset = 0;
+            grid.style.background = `linear-gradient(90deg, rgba(51, 65, 85, 0.15) 1px, transparent 1px) ${gridOffset}px 0 / 40px 100%,
+                                     linear-gradient(rgba(51, 65, 85, 0.15) 1px, transparent 1px) 0 0 / 100% 40px`;
+        }
+
+        // Menggambar Oskiloskop Kestabilan
+        function drawScope() {
+            const w = scopeCanvas.width;
+            const h = scopeCanvas.height;
+            scopeCtx.clearRect(0, 0, w, h);
+
+            // Garis Keseimbangan Nol (Tengah)
+            scopeCtx.strokeStyle = '#334155';
+            scopeCtx.lineWidth = 1;
+            scopeCtx.beginPath();
+            scopeCtx.moveTo(0, h / 2);
+            scopeCtx.lineTo(w, h / 2);
+            scopeCtx.stroke();
+
+            if (historyData.length < 2) return;
+            const step = w / 200;
+
+            // Gambar Kurva Pitch Angle (x1) - Cyan
+            scopeCtx.strokeStyle = '#06b6d4';
+            scopeCtx.lineWidth = 2.5;
+            scopeCtx.beginPath();
+            for (let i = 0; i < historyData.length; i++) {
+                const xPos = i * step;
+                const yPos = (h / 2) - (historyData[i].theta * (h / 1.8));
+                if (i === 0) scopeCtx.moveTo(xPos, yPos);
+                else scopeCtx.lineTo(xPos, yPos);
+            }
+            scopeCtx.stroke();
+
+            // Gambar Kurva Pitch Rate (x2) - Emerald
+            scopeCtx.strokeStyle = '#10b981';
+            scopeCtx.lineWidth = 1.5;
+            scopeCtx.beginPath();
+            for (let i = 0; i < historyData.length; i++) {
+                const xPos = i * step;
+                const yPos = (h / 2) - (historyData[i].q * (h / 1.8));
+                if (i === 0) scopeCtx.moveTo(xPos, yPos);
+                else scopeCtx.lineTo(xPos, yPos);
+            }
+            scopeCtx.stroke();
+        }
+
+        // Menggambar Horizon PFD Kokpit
+        function drawPFD() {
+            const size = pfdCanvas.width;
+            const center = size / 2;
+            const radius = size / 2 - 4;
+
+            pfdCtx.clearRect(0, 0, size, size);
+            pfdCtx.save();
+
+            pfdCtx.beginPath();
+            pfdCtx.arc(center, center, radius, 0, Math.PI * 2);
+            pfdCtx.clip();
+
+            const pitchDeg = x[0] * (180 / Math.PI);
+            const pitchPixels = pitchDeg * 2.2;
+
+            pfdCtx.translate(center, center);
+            pfdCtx.rotate(-pitchDeg * 0.005);
+
+            // Sisi Langit (Biru)
+            pfdCtx.fillStyle = '#1e3a8a';
+            pfdCtx.fillRect(-size, -size * 2 + pitchPixels, size * 2, size * 2);
+
+            // Sisi Tanah (Cokelat)
+            pfdCtx.fillStyle = '#78350f';
+            pfdCtx.fillRect(-size, pitchPixels, size * 2, size * 2);
+
+            // Cakrawala Putih
+            pfdCtx.strokeStyle = '#ffffff';
+            pfdCtx.lineWidth = 2.5;
+            pfdCtx.beginPath();
+            pfdCtx.moveTo(-size, pitchPixels);
+            pfdCtx.lineTo(size, pitchPixels);
+            pfdCtx.stroke();
+
+            pfdCtx.restore();
+
+            // Sayap Target Kokpit (Statis)
+            pfdCtx.strokeStyle = '#facc15';
+            pfdCtx.lineWidth = 3.5;
+            pfdCtx.beginPath();
+            pfdCtx.moveTo(center - 35, center);
+            pfdCtx.lineTo(center - 12, center);
+            pfdCtx.lineTo(center - 8, center + 8);
+            pfdCtx.moveTo(center, center - 2);
+            pfdCtx.arc(center, center, 1.5, 0, Math.PI * 2);
+            pfdCtx.moveTo(center + 12, center);
+            pfdCtx.lineTo(center + 35, center);
+            pfdCtx.lineTo(center + 8, center + 8);
+            pfdCtx.stroke();
+
+            document.getElementById('pfd-pitch-val').innerText = `${pitchDeg.toFixed(1)}°`;
+            document.getElementById('pfd-rate-val').innerText = `${(x[1] * (180 / Math.PI)).toFixed(1)}°/s`;
+        }
+
+        // Render Rotasi Pesawat di SVG
+        function renderAirplaneGraphics() {
+            const svgPlane = document.getElementById('airplane-svg');
+            const pitchInDeg = x[0] * (180 / Math.PI);
+            
+            svgPlane.style.transform = `rotate(${-pitchInDeg}deg)`;
+
+            const elevator = document.getElementById('elevator-surface');
+            const forceArrow = document.getElementById('force-arrow');
+            
+            // Defleksi visual kemudi elevator
+            const deflection = -u * 140; 
+            elevator.setAttribute('transform', `rotate(${deflection})`);
+
+            // Panah gaya angkat akibat kemudi
+            if (Math.abs(u) > 0.01) {
+                forceArrow.style.display = 'block';
+                forceArrow.setAttribute('y2', -u * 140);
+            } else {
+                forceArrow.style.display = 'none';
+            }
+
+            // Animasi jet flame
+            const jetFlame = document.getElementById('jet-flame');
+            const flameScale = 0.85 + Math.random() * 0.35 + (u > 0 ? 0.25 : 0);
+            jetFlame.setAttribute('transform', `scale(${flameScale}, 1) translate(${(1 - flameScale) * 100}, 0)`);
+        }
+
+        // Perbarui pembacaan teks pada dashboard
+        function updateDashboardText() {
+            const pitchDeg = (x[0] * (180 / Math.PI)).toFixed(2);
+            const pitchRateDeg = (x[1] * (180 / Math.PI)).toFixed(2);
+            const xdot2Deg = (x_dot[1] * (180 / Math.PI)).toFixed(2);
+            const uDeg = (u * (180 / Math.PI)).toFixed(2);
+
+            valPitchText.innerText = `${pitchDeg}°`;
+            valPitchRateText.innerText = `${pitchRateDeg}°/s`;
+            valXdotText.innerText = `${xdot2Deg}°/s²`;
+            valUText.innerText = `${uDeg}°`;
+        }
+
+
+        // --- COCKPIT INTERACTIVE EQUATION EXPLORER SYSTEM (NATIVE RENDER) ---
+        let activeExplorationVar = '';
+
+        function exploreVariable(variable) {
+            activeExplorationVar = variable;
+            const title = document.getElementById('explanation-title');
+            const text = document.getElementById('explanation-text');
+            const extra = document.getElementById('explanation-extra');
+            extra.classList.remove('hidden');
+
+            const u_val = u.toFixed(3);
+            const x1_val = x[0].toFixed(3);
+            const x2_val = x[1].toFixed(3);
+            const xdot1_val = x_dot[0].toFixed(3);
+            const xdot2_val = x_dot[1].toFixed(3);
+
+            let feedbackDesc = "";
+            if (isFBWActive) {
+                const fb_calc = (K_matrix[0] * x[0] + K_matrix[1] * x[1]).toFixed(3);
+                feedbackDesc = `<br><span class="text-emerald-400 font-bold">Koreksi Otomatis FBW Aktif:</span><br>
+                                u<sub>akhir</sub> = u<sub>pilot</sub> - K · x<br>
+                                u<sub>akhir</sub> = ${u_val} - (${K_matrix[0]} · ${x1_val} + ${K_matrix[1]} · ${x2_val}) = ${(u - parseFloat(fb_calc)).toFixed(3)} rad`;
+            } else {
+                feedbackDesc = `<br><span class="text-rose-400 font-bold">Sistem FBW Non-Aktif:</span><br>
+                                u<sub>akhir</sub> = u<sub>pilot</sub> = ${u_val} rad (Tidak ada umpan balik koreksi)`;
+            }
+
+            switch(variable) {
+                case 'xdot':
+                    title.innerHTML = "ẋ(t) (Vektor Laju Perubahan Keadaan)";
+                    text.innerHTML = `Mewakili seberapa cepat status pesawat bergeser pada milidetik saat ini. Berisi elemen <strong>[θ̇, q̇]</strong>.<br>
+                                      • <strong>θ̇ (Laju Pitch)</strong>: Kecepatan dongakan moncong pesawat.<br>
+                                      • <strong>q̇ (Akselerasi Pitch)</strong>: Percepatan rotasi vertikal pesawat.`;
+                    extra.innerHTML = `Nilai Laju Perubahan Saat Ini:<br>
+                                       θ̇ (Laju Pitch Angle) = [ ${xdot1_val} rad/s ]<br>
+                                       q̇ (Akselerasi Pitch) = [ ${xdot2_val} rad/s² ]`;
+                    break;
+                case 'state-x':
+                    title.innerHTML = "x(t) (Vektor Keadaan / State Vector)";
+                    text.innerHTML = `Ini adalah <strong>status fisik pesawat sesungguhnya saat ini</strong> yang dipantau oleh komputer penerbangan:<br>
+                                      • <strong>x<sub>1</sub> = θ (Pitch Angle)</strong>: Sudut kemiringan hidung pesawat terhadap ufuk rata.<br>
+                                      • <strong>x<sub>2</sub> = q (Pitch Rate)</strong>: Kecepatan sudut pesawat saat mendongak ke atas/bawah.`;
+                    extra.innerHTML = `Keadaan Sensor Saat Ini:<br>
+                                       x₁ (θ - Pitch Angle) = ${x1_val} rad (${(x[0]*180/Math.PI).toFixed(1)}°)<br>
+                                       x₂ (q - Pitch Rate)  = ${x2_val} rad/s (${(x[1]*180/Math.PI).toFixed(1)}°/s)`;
+                    break;
+                case 'input-u':
+                    title.innerHTML = "u(t) (Input Kendali / Control Input)";
+                    text.innerHTML = `Input yang masuk ke dalam sistem mekanik kemudi pesawat. Diatur dari tuas yang didorong pilot, lalu dimodifikasi oleh kalkulator FBW demi menjaga kestabilan.${feedbackDesc}`;
+                    extra.innerHTML = `Status Input:<br>
+                                       u (Perintah Pilot) = ${u_val} rad (${(u*180/Math.PI).toFixed(1)}°)`;
+                    break;
+                case 'output-y':
+                    title.innerHTML = "y(t) (Vektor Output Pengukuran)";
+                    text.innerHTML = `Mewakili nilai fisik yang <strong>diterjemahkan dan dibaca oleh instrumen sensor pesawat</strong> (seperti Gyroscope & Accelerometer). Sinyal ini yang kemudian diolah kembali ke dalam fungsi umpan balik komputer.`;
+                    extra.innerHTML = `Persamaan Output: y = C · x + D · u<br>
+                                       y₁ (Output Pitch) = ${x1_val} rad (Terbaca Sempurna)<br>
+                                       y₂ (Output Pitch Rate) = ${x2_val} rad/s`;
+                    break;
+                case 'matrix-a':
+                    title.innerHTML = "A (Matriks Sistem Aerodinamika Alami)";
+                    text.innerHTML = `Menjelaskan sifat fisika inheren pesawat berdasarkan desain struktur aerodinamisnya. Pada jet tempur ini, angka kestabilan memiliki koefisien positif (tidak stabil secara aerodinamis) agar pesawat memiliki kelincahan ekstrem ketika meliuk di udara.`;
+                    extra.innerHTML = `Susunan Matriks A:<br>
+                                       [  0.0   1.0 ]<br>
+                                       [  1.5  -0.2 ] -> Nilai 1.5 (positif) menyebabkan dorongan angin terus memperbesar kemiringan hidung pesawat (Instabilitas)`;
+                    break;
+                case 'matrix-b':
+                    title.innerHTML = "B (Matriks Input Efektivitas Elevator)";
+                    text.innerHTML = `Menggambarkan daya pengaruh dari kemudi sayap belakang (elevator) dalam menghasilkan percepatan rotasi hidung pesawat. Semakin tinggi nilainya, semakin sensitif respon pesawat terhadap tarikan tuas kemudi.`;
+                    extra.innerHTML = `Susunan Matriks B:<br>
+                                       [ 0.0 ] -> Elevator tidak mengubah sudut pitch secara instan tanpa gerakan roda putar.<br>
+                                       [ 3.0 ] -> Menghasilkan percepatan angular 3.0 kali lipat dari input defleksi kemudi.`;
+                    break;
+                case 'matrix-c':
+                    title.innerHTML = "C (Matriks Pemetaan Pembacaan Sensor)";
+                    text.innerHTML = `Matriks identitas yang mendefinisikan hubungan antara keadaan fisik pesawat nyata dan sensor yang merekamnya. Koefisien [1 0] dan [0 1] berarti semua variabel terbaca tanpa distorsi redaman.`;
+                    extra.innerHTML = `Susunan Matriks C:<br>
+                                       [ 1.0   0.0 ]<br>
+                                       [ 0.0   1.0 ]`;
+                    break;
+                case 'matrix-d':
+                    title.innerHTML = "D (Matriks Feedthrough Langsung)";
+                    text.innerHTML = `Menentukan jika gerakan tuas pilot secara langsung menginterupsi jarum sensor instrumen tanpa menyebabkan gerak fisik bodi pesawat terlebih dahulu. Pada hampir seluruh desain pesawat terbang, matriks ini bernilai nol [0].`;
+                    extra.innerHTML = `Susunan Matriks D:<br>
+                                       [ 0.0 ]<br>
+                                       [ 0.0 ]`;
+                    break;
+            }
+        }
+
+
+        // --- ANIMATION CONTROLLER (60 FPS LOOP) ---
+        function runSimulation() {
+            // Jalankan fisika matematika model
+            physicsStep();
+
+            // Render komponen pesawat
+            renderAirplaneGraphics();
+
+            // Gambar instrumen PFD
+            drawPFD();
+
+            // Gambar data grafik oskiloskop
+            drawScope();
+
+            // Teks dashboard
+            updateDashboardText();
+
+            // Update pergerakan garis hembusan angin
+            drawWindGrid();
+
+            requestAnimationFrame(runSimulation);
+        }
+
+        // Jalankan program setelah halaman dimuat
+        window.onload = function() {
+            resetAircraft(true); // Mulai dalam keadaan FBW Aktif stabil
+            runSimulation();
+        };
+    </script>
+</body>
+</html>
