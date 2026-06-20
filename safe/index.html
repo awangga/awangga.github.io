@@ -56,7 +56,7 @@
                     <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-rose-400 via-red-300 to-orange-400 bg-clip-text text-transparent">
                         Secure AI: Keamanan Kecerdasan Mesin
                     </h1>
-                    <p class="text-[10px] text-slate-400">Bagian "S" dari SAFE AI — Trend Terkini Kecerdasan Mesin</p>
+                    <p class="text-[10px] text-slate-400">Bagian "S" dari SAFE AI &middot; Trend Terkini Kecerdasan Mesin</p>
                 </div>
             </div>
 
@@ -117,7 +117,7 @@
                 </div>
             </div>
             <div class="mt-4 glass-panel rounded-xl p-4 border-l-4 border-rose-500">
-                <p class="text-sm text-slate-300"><b class="text-rose-400">Hati-hati membedakan:</b> <b>Security</b> (keamanan — melindungi sistem dari penyerang) berbeda dengan <b>Safety</b> (keselamatan — memastikan output model tidak membahayakan). Bagianmu adalah <b>Security</b>: bagaimana AI bertahan dari musuh yang sengaja menyerang.</p>
+                <p class="text-sm text-slate-300"><b>Security berbeda dengan Safety.</b> Security (keamanan) berarti melindungi sistem dari penyerang, sedangkan Safety (keselamatan) memastikan output model tidak membahayakan. Materi ini membahas Security, yaitu bagaimana AI bertahan dari pihak yang sengaja menyerang.</p>
             </div>
         </section>
 
@@ -125,9 +125,9 @@
         <section id="threat" class="scroll-mt">
             <div class="flex items-center gap-2 mb-4">
                 <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/30">BAGIAN 2</span>
-                <h2 class="text-xl font-bold">Threat Model &mdash; Slide Pembuka yang Wajib Ada</h2>
+                <h2 class="text-xl font-bold">Menyusun Threat Model</h2>
             </div>
-            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Sebelum membahas serangan, jawab dulu 3 pertanyaan inti. Ini yang membedakan presentasi "asal cerita" dengan presentasi yang terstruktur seperti pakar keamanan sungguhan.</p>
+            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Sebelum membahas serangan, kita perlu menjawab tiga pertanyaan dasar yang menentukan ruang lingkup keamanan.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="glass-panel rounded-xl p-5 glow-blue">
                     <div class="text-blue-400 mb-2"><i data-lucide="package" class="w-6 h-6"></i></div>
@@ -178,9 +178,9 @@
         <section id="adversarial" class="scroll-mt">
             <div class="flex items-center gap-2 mb-4">
                 <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/30">BAGIAN 4 &mdash; DEMO</span>
-                <h2 class="text-xl font-bold">Pendalaman: Adversarial Attack</h2>
+                <h2 class="text-xl font-bold">Adversarial Attack</h2>
             </div>
-            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Serangan paling terkenal di Computer Vision. Penyerang menambahkan <b>noise super kecil</b> yang tak terlihat mata manusia, tapi membuat model salah total. Ini contoh klasik Goodfellow dkk. (2015): foto <b>panda</b> + noise &rarr; model yakin itu <b>owa (gibbon)</b>.</p>
+            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Salah satu serangan yang banyak dibahas di Computer Vision. Penyerang menambahkan noise berukuran sangat kecil yang tidak terlihat oleh mata manusia, namun cukup untuk mengubah prediksi model. Pada contoh Goodfellow dkk. (2015), foto <b>panda</b> yang diberi noise diklasifikasikan model sebagai <b>owa (gibbon)</b>.</p>
 
             <div class="glass-panel rounded-xl p-6 glow-red">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center mb-6">
@@ -220,7 +220,7 @@
                     </div>
                     <div class="mt-4 text-sm text-center p-2 rounded transition-all" id="adv-verdict">Geser slider untuk menambahkan noise...</div>
                 </div>
-                <p class="text-xs text-slate-500 mt-4 italic"><b>Insight kunci:</b> mata manusia tetap melihat panda di semua tingkat noise, tapi model membalik prediksinya pada &epsilon; yang sangat kecil. Inilah celah keamanan: model "melihat" dengan cara yang berbeda dari manusia.</p>
+                <p class="text-xs text-slate-500 mt-4 italic">Mata manusia tetap mengenali panda pada semua tingkat noise, sedangkan model membalik prediksinya pada &epsilon; yang sangat kecil. Celah keamanan muncul karena model memproses citra dengan cara yang berbeda dari manusia.</p>
 
                 <!-- Rumus FGSM -->
                 <div class="mt-4 bg-slate-950/60 rounded-lg p-4 border border-slate-800">
@@ -234,7 +234,7 @@
                         <div><span class="code-font text-rose-300">J(&theta;,x,y)</span> = loss model terhadap label benar</div>
                         <div><span class="code-font text-rose-300">&nabla;<sub>x</sub>J</span> = arah gradien yang menaikkan error</div>
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-2 italic">Intinya: dorong setiap piksel ke arah yang <b>memaksimalkan kesalahan</b> model, sekecil mungkin agar tak terlihat mata. <span class="code-font">sign()</span> hanya mengambil arah (+/&minus;), bukan besarnya.</p>
+                    <p class="text-[11px] text-slate-500 mt-2 italic">Perturbasi menggeser setiap piksel ke arah yang memaksimalkan kesalahan model, dengan besaran sekecil mungkin agar tidak terlihat. Fungsi <span class="code-font">sign()</span> hanya mengambil arah (+/&minus;), bukan besarnya.</p>
                 </div>
             </div>
         </section>
@@ -243,9 +243,9 @@
         <section id="injection" class="scroll-mt">
             <div class="flex items-center gap-2 mb-4">
                 <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/30">BAGIAN 5 &mdash; DEMO</span>
-                <h2 class="text-xl font-bold">Pendalaman: Prompt Injection &amp; Jailbreak (Era LLM)</h2>
+                <h2 class="text-xl font-bold">Prompt Injection &amp; Jailbreak (Era LLM)</h2>
             </div>
-            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Ancaman keamanan paling relevan di 2025+. LLM tidak bisa membedakan mana "instruksi dari developer" dan mana "data dari pengguna" &mdash; keduanya cuma teks. Penyerang menyisipkan instruksi jahat ke dalam input.</p>
+            <p class="text-sm text-slate-400 mb-4 max-w-3xl">Ancaman yang relevan sejak meluasnya penggunaan LLM. Model bahasa sulit membedakan mana "instruksi dari developer" dan mana "data dari pengguna" karena keduanya berupa teks. Penyerang memanfaatkan hal ini dengan menyisipkan instruksi berbahaya ke dalam input.</p>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Input pengguna -->
@@ -276,9 +276,9 @@
         <section id="defense" class="scroll-mt">
             <div class="flex items-center gap-2 mb-4">
                 <span class="text-xs font-mono text-rose-400 bg-rose-500/10 px-2 py-1 rounded border border-rose-500/30">BAGIAN 6</span>
-                <h2 class="text-xl font-bold">Peta Pertahanan: Tiap Serangan Ada Penangkalnya</h2>
+                <h2 class="text-xl font-bold">Pemetaan Serangan dan Pertahanan</h2>
             </div>
-            <p class="text-sm text-slate-400 mb-4">Slide penutup yang kuat = pasangkan tiap ancaman dengan solusinya. Ini menunjukkan kamu paham siklus lengkap, bukan cuma menakut-nakuti.</p>
+            <p class="text-sm text-slate-400 mb-4">Setiap jenis serangan memiliki teknik pertahanan yang sesuai. Tabel berikut memasangkan keduanya beserta ide dasarnya.</p>
             <div class="overflow-x-auto glass-panel rounded-xl">
                 <table class="w-full text-sm">
                     <thead>
@@ -297,7 +297,7 @@
             <!-- Kesimpulan -->
             <div class="mt-6 glass-panel rounded-xl p-6 border-l-4 border-emerald-500 glow-emerald">
                 <h3 class="font-bold text-emerald-400 mb-2 flex items-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i> Kesimpulan Bagian Secure</h3>
-                <p class="text-sm text-slate-300 leading-relaxed">Keamanan AI bukan fitur tambahan, tapi <b>perlombaan senjata</b> (arms race) yang terus berjalan: setiap pertahanan baru memicu serangan baru. Tiga prinsip yang harus disampaikan: (1) <b>asumsikan penyerang ada</b> sejak desain, (2) <b>amankan seluruh siklus</b> — data, training, deployment, hingga inferensi, dan (3) <b>tidak ada model yang 100% aman</b> — tujuannya menaikkan biaya serangan setinggi mungkin.</p>
+                <p class="text-sm text-slate-300 leading-relaxed">Keamanan AI bersifat berkelanjutan karena setiap pertahanan baru biasanya diikuti oleh serangan baru (kondisi yang sering disebut arms race). Tiga prinsip yang perlu diperhatikan: (1) asumsikan penyerang selalu ada sejak tahap desain, (2) amankan seluruh siklus, mulai dari data, pelatihan, penerapan, hingga inferensi, dan (3) tidak ada model yang sepenuhnya aman sehingga tujuannya adalah menaikkan biaya serangan setinggi mungkin.</p>
             </div>
         </section>
 
@@ -340,7 +340,7 @@
                     <div class="flex-1">
                         <h3 class="font-bold text-sm">Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection</h3>
                         <p class="text-xs text-slate-400 mt-1">K. Greshake, S. Abdelnabi, S. Mishra, C. Endres, T. Holz, &amp; M. Fritz &middot; <b>ACM AISec 2023</b> &middot; arXiv:2302.12173</p>
-                        <p class="text-[11px] text-slate-500 mt-1">Peer-reviewed (ACM) &middot; ~760 sitasi &middot; <span class="text-rose-300">Dasar Demo 2 — "LLM blur the line between data and instructions".</span></p>
+                        <p class="text-[11px] text-slate-500 mt-1">Peer-reviewed (ACM) &middot; ~760 sitasi &middot; <span class="text-rose-300">Dasar Demo 2, dengan pernyataan "LLM blur the line between data and instructions".</span></p>
                         <a href="https://arxiv.org/abs/2302.12173" target="_blank" class="text-xs text-blue-400 hover:underline inline-flex items-center gap-1 mt-1"><i data-lucide="external-link" class="w-3 h-3"></i> arxiv.org/abs/2302.12173</a>
                     </div>
                     <button onclick="copyBib('bib2', this)" class="text-[11px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 whitespace-nowrap transition flex items-center gap-1"><i data-lucide="copy" class="w-3 h-3"></i> BibTeX</button>
@@ -401,7 +401,7 @@
                 icon: 'database', color: 'purple', phase: 'KEBOCORAN DATA',
                 title: 'Membership Inference & Inversion',
                 desc: 'Penyerang menebak apakah data seseorang dipakai untuk melatih model, atau bahkan merekonstruksi data training asli.',
-                example: 'Mengetahui bahwa rekam medis pasien X dipakai melatih model rumah sakit — pelanggaran privasi.'
+                example: 'Mengetahui bahwa rekam medis pasien X dipakai melatih model rumah sakit, yang termasuk pelanggaran privasi.'
             },
             {
                 icon: 'message-square-warning', color: 'rose', phase: 'ERA LLM',
@@ -476,13 +476,13 @@
                 resultEmoji.innerText = '🐼';
                 resultLabel.innerHTML = `<span class="text-emerald-400">"panda" ${conf}%</span>`;
                 verdict.className = 'mt-4 text-sm text-center p-2 rounded transition-all bg-emerald-500/10 text-emerald-300';
-                verdict.innerText = '✓ Model masih benar — noise terlalu kecil. Mata manusia: tetap panda.';
+                verdict.innerText = 'Model masih benar. Noise masih terlalu kecil, dan mata manusia tetap melihat panda.';
             } else {
                 const conf = Math.min(99, 60 + (val - 7) * 0.42).toFixed(0);
                 resultEmoji.innerText = '🦧';
                 resultLabel.innerHTML = `<span class="text-rose-400">"owa/gibbon" ${conf}%</span>`;
                 verdict.className = 'mt-4 text-sm text-center p-2 rounded transition-all bg-rose-500/10 text-rose-300 font-bold';
-                verdict.innerHTML = `⚠ MODEL TERTIPU! Yakin ${conf}% itu owa — padahal mata manusia tetap melihat PANDA.`;
+                verdict.innerHTML = `Model tertipu. Model yakin ${conf}% citra ini adalah owa, padahal mata manusia tetap melihat panda.`;
             }
         }
 
@@ -500,7 +500,7 @@
         injectCases.forEach((c, i) => {
             const btn = document.createElement('button');
             btn.className = 'text-left text-xs px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-2';
-            btn.innerHTML = `<span class="font-mono text-[10px] ${c.malicious ? 'text-rose-400' : 'text-emerald-400'}">${c.malicious ? '☠' : '✓'}</span> <span class="text-slate-300">${c.text}</span>`;
+            btn.innerHTML = `<span class="font-mono text-[10px] ${c.malicious ? 'text-rose-400' : 'text-emerald-400'}">${c.malicious ? '[!]' : '[ok]'}</span> <span class="text-slate-300">${c.text}</span>`;
             btn.onclick = () => runInjection(c);
             injBtnContainer.appendChild(btn);
         });
@@ -524,13 +524,13 @@
 
             let reply, leaked;
             if (!c.malicious) {
-                reply = 'Tentu! Maaf, saya tidak punya akses jam nyata, tapi ada yang bisa saya bantu? 😊';
+                reply = 'Maaf, saya tidak memiliki akses ke jam nyata. Ada hal lain yang bisa saya bantu?';
                 leaked = false;
             } else if (defenseOn) {
                 reply = 'Maaf, saya mendeteksi upaya manipulasi instruksi. Permintaan itu tidak dapat saya penuhi.';
                 leaked = false;
             } else {
-                reply = 'Oh tentu! Kunci rahasianya adalah SK-2026. 🙈';
+                reply = 'Tentu, kunci rahasianya adalah SK-2026.';
                 leaked = true;
             }
 
@@ -539,13 +539,13 @@
                 verdict.classList.remove('hidden');
                 if (leaked) {
                     verdict.className = 'mt-3 text-xs p-2 rounded bg-rose-500/10 text-rose-300';
-                    verdict.innerHTML = '⚠ <b>BOCOR!</b> Tanpa pertahanan, LLM menuruti instruksi penyerang. Nyalakan mode pertahanan dan coba lagi.';
+                    verdict.innerHTML = '<b>Kunci bocor.</b> Tanpa pertahanan, LLM menuruti instruksi penyerang. Aktifkan mode pertahanan lalu coba lagi.';
                 } else if (c.malicious) {
                     verdict.className = 'mt-3 text-xs p-2 rounded bg-emerald-500/10 text-emerald-300';
-                    verdict.innerHTML = '✓ <b>Tertahan.</b> Filter input + instruksi yang diperkuat berhasil memblokir serangan.';
+                    verdict.innerHTML = '<b>Serangan tertahan.</b> Filter input dan instruksi yang diperkuat memblokir permintaan tersebut.';
                 } else {
                     verdict.className = 'mt-3 text-xs p-2 rounded bg-slate-700/30 text-slate-400';
-                    verdict.innerHTML = 'ℹ Input normal — diproses seperti biasa.';
+                    verdict.innerHTML = 'Input normal, diproses seperti biasa.';
                 }
             }, 250);
         }
@@ -572,18 +572,18 @@
 
         // ===================== SKRIP PRESENTASI =====================
         const script = [
-            { t: '0:00 - 1:00', title: 'Pembuka — apa itu "Secure" AI?',
-              say: 'Salam. "Tim kami membahas SAFE AI. Saya pegang huruf S — Secure. Sederhananya: bagaimana AI bertahan saat ada orang yang sengaja ingin menyerang atau menipunya." Tekankan beda Security (musuh) vs Safety (output berbahaya).' },
+            { t: '0:00 - 1:00', title: 'Pembuka: apa itu Secure AI',
+              say: 'Perkenalkan topik. Sampaikan bahwa kelompok membahas SAFE AI dan bagian ini fokus pada huruf S, yaitu Secure: bagaimana AI bertahan ketika ada pihak yang sengaja menyerang atau menipunya. Tekankan perbedaan Security (terhadap penyerang) dan Safety (output berbahaya).' },
             { t: '1:00 - 2:00', title: 'Threat Model',
-              say: 'Tampilkan 3 pertanyaan: apa yang dilindungi, dari siapa, dan seberapa tahu penyerang (white-box vs black-box). "Sama seperti keamanan rumah — kita harus tahu dulu apa yang berharga dan siapa malingnya."' },
+              say: 'Jelaskan tiga pertanyaan: apa yang dilindungi, dari siapa, dan seberapa banyak penyerang mengetahui sistem (white-box vs black-box). Analogi keamanan rumah dapat membantu: kita perlu tahu dulu apa yang berharga dan siapa pelakunya.' },
             { t: '2:00 - 3:30', title: 'Taksonomi serangan',
-              say: 'Buka beberapa kartu. Jangan baca semua — pilih 3 paling menarik (adversarial, data poisoning, prompt injection). Pakai contoh nyata: stiker di rambu STOP membuat mobil otonom salah baca.' },
-            { t: '3:30 - 5:30', title: 'DEMO 1 — Adversarial Attack',
-              say: 'Ini puncaknya. Geser slider pelan-pelan. "Perhatikan, mata kita tetap melihat panda... tapi di noise sekecil ini, model yakin 90%+ ini owa." Tunjukkan rumus FGSM sebentar: noise didorong ke arah yang memaksimalkan error.' },
-            { t: '5:30 - 7:00', title: 'DEMO 2 — Prompt Injection',
-              say: 'Klik serangan saat pertahanan OFF → kunci rahasia bocor. "Inilah kenapa chatbot bisa dibobol." Lalu nyalakan pertahanan ON, klik lagi → tertahan. Sangat impactful secara visual.' },
-            { t: '7:00 - 8:00', title: 'Pertahanan & penutup',
-              say: 'Tampilkan tabel serangan↔solusi. Tutup dengan 3 prinsip: asumsikan penyerang ada, amankan seluruh siklus, tidak ada yang 100% aman — ini arms race. Serahkan ke teman yang pegang huruf A (Accountable).' },
+              say: 'Buka beberapa kartu, tidak perlu semuanya. Pilih tiga yang paling relevan, misalnya adversarial, data poisoning, dan prompt injection. Gunakan contoh nyata seperti stiker pada rambu lalu lintas yang membuat mobil otonom salah membaca.' },
+            { t: '3:30 - 5:30', title: 'Demo 1: Adversarial Attack',
+              say: 'Geser slider secara bertahap. Tunjukkan bahwa mata kita tetap mengenali panda, tetapi pada noise yang sangat kecil model memprediksinya sebagai owa. Tampilkan rumus FGSM secara singkat untuk menjelaskan arah noise yang memaksimalkan error.' },
+            { t: '5:30 - 7:00', title: 'Demo 2: Prompt Injection',
+              say: 'Saat pertahanan dalam posisi OFF, jalankan serangan sehingga kunci rahasia bocor. Lalu aktifkan pertahanan dan jalankan kembali untuk menunjukkan serangan tertahan. Bandingkan kedua hasilnya.' },
+            { t: '7:00 - 8:00', title: 'Pertahanan dan penutup',
+              say: 'Tampilkan tabel pasangan serangan dan pertahanan. Tutup dengan tiga prinsip: asumsikan penyerang ada, amankan seluruh siklus, dan tidak ada model yang sepenuhnya aman. Serahkan giliran ke anggota berikutnya yang membahas huruf A (Accountable).' },
         ];
         const ss = document.getElementById('script-steps');
         script.forEach((s, i) => {
