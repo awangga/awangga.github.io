@@ -8,6 +8,11 @@ Konten:
 2. Federated Learning
 3. Self-Supervised Learning
 
+## Materi Interaktif
+1. [Mamba (State Space Model)](./mamba) — arsitektur pengganti Transformer
+2. [SSM](./ssm) — State Space Model
+3. [SAFE AI — Secure](./safe) — keamanan AI: threat model, serangan & pertahanan (demo interaktif)
+
 ## Adaptive Learning
 
 Sering juga disebut sebagai active learning atau human in the loop machine learning
