@@ -7,6 +7,10 @@ Konten:
 1. Adaptive Learning
 2. Federated Learning
 3. Self-Supervised Learning
+4. Transformer Neural Network
+5. Hybrid Symbolic AI
+6. Automated Machine Learning
+7. SAFE AI
 
 ## Materi Interaktif
 1. [Mamba (State Space Model)](./mamba) — arsitektur pengganti Transformer
