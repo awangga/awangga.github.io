@@ -85,6 +85,14 @@ def safe_tag(s, x, y, letter, name, col):
     text(s, x + 0.5, y, 2.0, 0.42, [[(name, 12, col, True)]], anchor=MSO_ANCHOR.MIDDLE)
 
 
+def quad(s, x, y, w, h, label, color, lines):
+    """Satu kuadran ringkasan: label berwarna + butir teks."""
+    box(s, x, y, w, h, fill=PANEL, line=color, line_w=1.5)
+    text(s, x + 0.25, y + 0.12, w - 0.5, 0.35, [[(label, 13, color, True)]])
+    runs = [[("•  " + ln, 11.5, GREY, False)] for ln in lines]
+    text(s, x + 0.25, y + 0.6, w - 0.5, h - 0.72, runs, space_after=4, line_spacing=1.15)
+
+
 # ============================================================= 1. JUDUL
 s = slide()
 text(s, 0.6, 1.7, 12.1, 1.0, [[("METRIK SAFE AI", 50, INDIGO, True)]], align=PP_ALIGN.CENTER)
@@ -174,7 +182,7 @@ left = [
     ("Masalah", "Contrastive learning (SimCLR dll.) belajar dari data tanpa label. "
      "Representasinya bisa diam-diam menyandi bias (gender, ras). Fairness sulit diukur karena tidak ada label."),
     ("Ide", "Adversarial fair representation learning: minimkan contrastive loss pada data tak berlabel, "
-     "sambil maksimalkan loss penebak atribut sensitif pada sedikit data berlabel (permainan minimax)."),
+     "sambil maksimalkan loss penebak atribut sensitif pada sedikit data berlabel (minimax game)."),
 ]
 y = 2.6
 for (t, b) in left:
@@ -209,7 +217,7 @@ text(s, 1.4, 2.0, 10.5, 1.2,
      [[("F(w, w′)  =  F_GCL(w)  +  α · F_fair(w, w′)", 23, EMERALD, True)]],
      align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 text(s, 0.6, 3.3, 12.1, 0.4,
-     [[("minimalkan terhadap encoder w  ·  maksimalkan terhadap diskriminator w′  ·  "
+     [[("minimalkan terhadap encoder w  ·  maksimalkan terhadap discriminator w′  ·  "
         "α = bobot trade-off (fairness ↔ akurasi)", 12, GREY, False)]],
      align=PP_ALIGN.CENTER)
 box(s, 0.6, 3.9, 6.0, 2.7, fill=PANEL, line=EMERALD, line_w=1.5)
@@ -221,8 +229,8 @@ text(s, 0.85, 4.6, 5.5, 1.9,
 box(s, 6.73, 3.9, 6.0, 2.7, fill=PANEL, line=ROSE, line_w=1.5)
 text(s, 6.98, 4.05, 5.5, 0.4, [[("Suku F_fair  (fairness)", 15, ROSE, True)]])
 text(s, 6.98, 4.6, 5.5, 1.9,
-     [[("Diskriminator berusaha menebak atribut sensitif (mis. gender) dari representasi. "
-        "Encoder dilatih agar diskriminator ", 13, GREY, False),
+     [[("Discriminator berusaha menebak atribut sensitif (mis. gender) dari representasi. "
+        "Encoder dilatih agar discriminator ", 13, GREY, False),
        ("gagal", 13, WHITE, True),
        (", sehingga representasi tidak membawa informasi sensitif.", 13, GREY, False)]],
      line_spacing=1.3)
@@ -237,7 +245,7 @@ steps = [
     ("2", "Buat 2 augmentasi tiap sampel; perbarui moving-average u (estimator suku contrastive)."),
     ("3", "Hitung gradien dari nilai u, lalu haluskan dengan momentum."),
     ("4", "Encoder turun gradien:   w ← w − η · g"),
-    ("5", "Diskriminator naik gradien:   w′ ← w′ + η′ · v"),
+    ("5", "Discriminator naik gradien:   w′ ← w′ + η′ · v"),
 ]
 y = 2.3
 for (n, b) in steps:
@@ -276,6 +284,28 @@ for i, (t, b) in enumerate(pts, 1):
          [[(t, 16, WHITE, True)], [(b, 13, GREY, False)]], space_after=4, anchor=MSO_ANCHOR.MIDDLE)
     y += 1.65
 
+# ============================================================= 7b. PAPER 1 - RINGKASAN
+s = slide()
+header(s, "PAPER 1 · RINGKASAN", "SoFCLR: Ringkasan", color=EMERALD)
+quad(s, 0.6, 1.5, 6.0, 2.55, "METODE", EMERALD, [
+    "Minimax game: min encoder, max discriminator atas F_GCL + α·F_fair.",
+    "Global contrastive loss diestimasi lewat moving-average u + momentum.",
+])
+quad(s, 6.73, 1.5, 6.0, 2.55, "KONTRIBUSI", EMERALD, [
+    "Algoritma fair-SSL pertama dengan konvergensi terbukti O(ε⁻⁴), tanpa batch besar.",
+    "Cukup label atribut sensitif pada sebagian kecil data.",
+    "Tak mengubah contrastive loss, kompatibel dengan SimCLR/CLIP.",
+])
+quad(s, 0.6, 4.18, 6.0, 2.55, "HASIL", EMERALD, [
+    "Dataset CelebA & UTKFace (citra wajah), diukur 8 fairness notions.",
+    "CelebA (Attractive×Male): Δ_ED 14,93 vs SimCLR 26,58 (lebih adil).",
+    "UTKFace: Δ_ED 15,42 (~20% lebih baik dari SimCLR), akurasi tetap ~85%.",
+])
+quad(s, 6.73, 4.18, 6.0, 2.55, "FUTURE RESEARCH", EMERALD, [
+    "Eksplisit: perluasan ke data multi-modality.",
+    "(Inferensi) atribut sensitif lain & penyetelan trade-off α.",
+])
+
 # ============================================================= 8. PAPER 2 - DecodingTrust
 s = slide()
 header(s, "PAPER 2 · LLM", "DecodingTrust: 8 Perspektif", color=ROSE)
@@ -309,6 +339,31 @@ text(s, 0.85, 5.0, 11.6, 1.6,
         "akurasi-fairness: GPT-4 lebih akurat pada data seimbang, tapi lebih tidak adil pada data timpang.",
         13.5, GREY, False)]],
      anchor=MSO_ANCHOR.MIDDLE, space_after=6, line_spacing=1.2)
+
+# ============================================================= 8b. PAPER 2 - RINGKASAN
+s = slide()
+header(s, "PAPER 2 · RINGKASAN", "DecodingTrust: Ringkasan", color=ROSE)
+quad(s, 0.6, 1.5, 6.0, 2.55, "METODE", ROSE, [
+    "Uji GPT-3.5 & GPT-4 pada 8 perspektif trustworthiness.",
+    "Benchmark standar (AdvGLUE, RealToxicityPrompts, ETHICS) + baru (AdvGLUE++).",
+    "Skenario zero/few-shot + adversarial prompt & backdoored demo.",
+])
+quad(s, 6.73, 1.5, 6.0, 2.55, "KONTRIBUSI", ROSE, [
+    "Framework 8 perspektif yang menyesuaikan kemampuan baru GPT (instruction following).",
+    "Mengungkap gap: GPT-4 lebih baik di benchmark standar, lebih rentan jailbreak.",
+    "Benchmark + dataset dirilis open-source.",
+])
+quad(s, 0.6, 4.18, 6.0, 2.55, "HASIL", ROSE, [
+    "Jailbreak prompt: toxicity melonjak hingga ~100%.",
+    "AdvGLUE++: SemAttack 89,2% ASR (GPT-4); BERT-ATTACK 100% (GPT-3.5).",
+    "Privacy: ekstraksi email 100× lebih akurat bila domain diketahui.",
+    "Fairness: GPT-4 lebih akurat (85,5%) tapi lebih unfair, muncul trade-off.",
+])
+quad(s, 6.73, 4.18, 6.0, 2.55, "FUTURE RESEARCH", ROSE, [
+    "Eksplisit: evaluasi percakapan multi-turn & 'honeypot conversation'.",
+    "Eksplisit: penyelarasan metrik dengan persepsi manusia.",
+    "(Inferensi) mekanisme pertahanan anti-jailbreak.",
+])
 
 # ============================================================= 9. PAPER 3 - HELM
 s = slide()
@@ -346,6 +401,31 @@ text(s, 6.98, 4.55, 5.5, 1.9,
        ("metadata demografi sering tak tersedia", 13, WHITE, True),
        ("; disparitas langsung diukur bila metadata ada.", 13, GREY, False)]],
      line_spacing=1.3)
+
+# ============================================================= 9b. PAPER 3 - RINGKASAN
+s = slide()
+header(s, "PAPER 3 · RINGKASAN", "HELM: Ringkasan", color=BLUE)
+quad(s, 0.6, 1.5, 6.0, 2.55, "METODE", BLUE, [
+    "Evaluasi holistik multi-metrik: 7 metrik × 16 core scenarios.",
+    "Robustness: invariance (typo) & equivariance (contrast set).",
+    "Fairness: counterfactual (dialek SAE→AAE, gender) + disparitas demografi.",
+])
+quad(s, 6.73, 1.5, 6.0, 2.55, "KONTRIBUSI", BLUE, [
+    "Taksonomi eksplisit ruang desain (scenario × metrik): jelas yang diukur & yang hilang.",
+    "Standardisasi 30 model dari 12 organisasi; coverage 17,9% → 96,0%.",
+    "Living benchmark; prompt & hasil mentah dirilis publik.",
+])
+quad(s, 0.6, 4.18, 6.0, 2.55, "HASIL", BLUE, [
+    "98 dari 112 pasangan (scenario, metrik) terukur = 87,5%.",
+    "Instruction-tuning > skala: model 52B masuk top-3, kalahkan 530B.",
+    "Perturbasi: TNLG v2 turun 72,6% → 38,9% (NarrativeQA).",
+    "Dialek: OPT-175B 1,506 → 2,114 bits/byte (English → AAE).",
+])
+quad(s, 6.73, 4.18, 6.0, 2.55, "FUTURE RESEARCH", BLUE, [
+    "Eksplisit: kerangka agregasi skor & surrogate intrinsik (perplexity).",
+    "Eksplisit: uji signifikansi multi-seed.",
+    "(Limitasi) cakupan dialek non-English, tugas interaktif & multimodal.",
+])
 
 # ============================================================= 10. SINTESIS MATRIKS
 s = slide()
