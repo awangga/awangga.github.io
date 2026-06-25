@@ -145,6 +145,44 @@ text(s, 0.85, 5.7, 11.6, 1.0,
         14, WHITE, False)]],
      anchor=MSO_ANCHOR.MIDDLE)
 
+# ============================================================= 2b. BENANG MERAH
+s = slide()
+header(s, "BENANG MERAH", "Bagaimana Ketiga Paper Terhubung")
+# tesis bersama
+box(s, 0.6, 1.5, 12.13, 0.95, fill=PANEL, line=INDIGO, line_w=1.5)
+text(s, 0.85, 1.5, 11.6, 0.95,
+     [[("Pertanyaan bersama:  ", 14, INDIGO_L, True),
+       ("bagaimana dimensi SAFE ditegakkan, lalu diukur, pada model nyata?", 14, WHITE, False)]],
+     anchor=MSO_ANCHOR.MIDDLE)
+# tiga lapisan siklus
+unify = [
+    ("SAAT MELATIH", "SoFCLR", "Bangun model fair", EMERALD,
+     "Menanam fairness ke representasi SSL sejak awal, sebelum label ada (intervensi by-design)."),
+    ("UJI MENDALAM", "DecodingTrust", "Cari titik rapuh", ROSE,
+     "Stress-test LLM dengan serangan & prompt adversarial pada 8 perspektif trustworthiness."),
+    ("UJI MENYELURUH", "HELM", "Bandingkan terbuka", BLUE,
+     "Benchmark terstandar 7 metrik lintas 30 model agar bisa dibandingkan secara transparan."),
+]
+x = 0.6
+for (stage, name, role, col, desc) in unify:
+    box(s, x, 2.7, 3.93, 2.7, fill=PANEL, line=col, line_w=1.5)
+    chip(s, x + 0.3, 2.95, stage, col, w=3.0)
+    text(s, x + 0.3, 3.55, 3.4, 0.5, [[(name, 18, WHITE, True)]])
+    text(s, x + 0.3, 4.1, 3.4, 0.4, [[(role, 13, col, True)]])
+    text(s, x + 0.3, 4.55, 3.4, 0.8, [[(desc, 11.5, GREY, False)]], line_spacing=1.2)
+    if x < 8:
+        text(s, x + 3.93, 2.7, 0.13, 2.7, [[("›", 30, GREY_D, True)]],
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    x += 4.06
+# sintesis bawah
+box(s, 0.6, 5.65, 12.13, 1.15, fill=PANEL, line=INDIGO, line_w=1.5)
+text(s, 0.85, 5.65, 11.6, 1.15,
+     [[("SoFCLR menegakkan SAFE saat model dilatih; DecodingTrust dan HELM mengukurnya setelah "
+        "model jadi. Ketiganya menutup alur ", 13.5, WHITE, False),
+       ("bangun, uji, dan bandingkan", 13.5, INDIGO_L, True),
+       (" model yang SAFE.", 13.5, WHITE, False)]],
+     anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.2)
+
 # ============================================================= 3. PETA 3 PAPER
 s = slide()
 header(s, "PETA", "Tiga Paper yang Dipakai")
@@ -180,7 +218,7 @@ text(s, 0.6, 1.95, 12.1, 0.45,
      [[("Qi, Hu, Lin & Yang (2024) · arXiv:2406.05686", 12, GREY_D, False)]])
 left = [
     ("Masalah", "Contrastive learning (SimCLR dll.) belajar dari data tanpa label. "
-     "Representasinya bisa diam-diam menyandi bias (gender, ras). Fairness sulit diukur karena tidak ada label."),
+     "Representasinya bisa diam-diam menyimpan bias (gender, ras). Fairness sulit diukur karena tidak ada label."),
     ("Ide", "Adversarial fair representation learning: minimkan contrastive loss pada data tak berlabel, "
      "sambil maksimalkan loss penebak atribut sensitif pada sedikit data berlabel (minimax game)."),
 ]
@@ -273,7 +311,7 @@ pts = [
     ("Optimisasi sulit", "Minimax-nya non-convex non-concave, diperberat global contrastive loss yang "
      "membandingkan tiap sampel dengan semua sampel lain. SoFCLR memberi solusi terbukti (provable)."),
     ("Bukan otomatis adil", "Penulis menegaskan SSL tidak inheren adil; pra-pelatihan tetap dapat "
-     "menyandi bias bila tidak diberi sinyal fairness eksplisit."),
+     "menyimpan bias bila tidak diberi sinyal fairness eksplisit."),
 ]
 y = 1.7
 for i, (t, b) in enumerate(pts, 1):
