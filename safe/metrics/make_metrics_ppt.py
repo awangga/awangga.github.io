@@ -93,6 +93,13 @@ def quad(s, x, y, w, h, label, color, lines):
     text(s, x + 0.25, y + 0.6, w - 0.5, h - 0.72, runs, space_after=4, line_spacing=1.15)
 
 
+def analogi(s, y, txt, h=0.7):
+    """Strip analogi bahasa awam di bagian bawah slide."""
+    box(s, 0.6, y, 12.13, h, fill=RGBColor(0x1E, 0x29, 0x3B), line=AMBER, line_w=1.25)
+    text(s, 0.85, y, 11.6, h, [[("Analogi:  ", 12.5, AMBER, True), (txt, 12.5, WHITE, False)]],
+         anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.1)
+
+
 # ============================================================= 1. JUDUL
 s = slide()
 text(s, 0.6, 1.7, 12.1, 1.0, [[("METRIK SAFE AI", 50, INDIGO, True)]], align=PP_ALIGN.CENTER)
@@ -244,6 +251,10 @@ text(s, 7.08, 5.25, 5.4, 1.1,
        (", menyiasati global contrastive loss yang mahal.", 12.5, GREY, False)]],
      line_spacing=1.25)
 
+analogi(s, 6.55,
+        "seperti anak yang belajar dari internet tanpa pengawasan, AI bisa ikut menyerap "
+        "prasangka dari data tanpa disuruh.")
+
 # ============================================================= 5. PAPER 1 - ALGORITMA (OBJEKTIF)
 s = slide()
 header(s, "PAPER 1 · ALGORITMA", "Cara Kerja SoFCLR", color=EMERALD)
@@ -272,6 +283,10 @@ text(s, 6.98, 4.6, 5.5, 1.9,
        ("gagal", 13, WHITE, True),
        (", sehingga representasi tidak membawa informasi sensitif.", 13, GREY, False)]],
      line_spacing=1.3)
+
+analogi(s, 6.7,
+        "permainan kucing-tikus. Satu pemain menyembunyikan info gender, satu mencoba "
+        "menebaknya. Kalau penebak gagal, berarti AI makin adil.")
 
 # ============================================================= 6. PAPER 1 - ALGORITMA (LANGKAH)
 s = slide()
@@ -439,6 +454,10 @@ text(s, 6.98, 4.55, 5.5, 1.9,
        ("metadata demografi sering tak tersedia", 13, WHITE, True),
        ("; disparitas langsung diukur bila metadata ada.", 13, GREY, False)]],
      line_spacing=1.3)
+
+analogi(s, 6.62,
+        "seperti rapor sekolah dengan banyak mata pelajaran. HELM memberi nilai 7 ukuran "
+        "untuk 30 model AI agar bisa dibandingkan secara adil.")
 
 # ============================================================= 9b. PAPER 3 - RINGKASAN
 s = slide()
