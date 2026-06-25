@@ -115,6 +115,24 @@ def dots(s, x, y, w, v, color):
          align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space_after=0)
 
 
+def bg_slide(kicker, title, color, intro, konteks, gap, bridge, kw=2.6):
+    """Slide latar belakang: Konteks + Kesenjangan + jembatan ke paper."""
+    s = slide()
+    header(s, kicker, title, color=color, kw=kw)
+    text(s, 0.6, 1.5, 12.1, 0.55, [[(intro, 14, GREY, False)]])
+    box(s, 0.6, 2.2, 6.0, 2.75, fill=PANEL, line=LINE)
+    text(s, 0.85, 2.35, 5.5, 0.4, [[("Konteks", 14, color, True)]])
+    text(s, 0.85, 2.9, 5.5, 1.9, [[(konteks, 13, GREY, False)]], line_spacing=1.3)
+    box(s, 6.73, 2.2, 6.0, 2.75, fill=PANEL, line=LINE)
+    text(s, 6.98, 2.35, 5.5, 0.4, [[("Kesenjangan", 14, color, True)]])
+    text(s, 6.98, 2.9, 5.5, 1.9, [[(gap, 13, GREY, False)]], line_spacing=1.3)
+    box(s, 0.6, 5.15, 12.13, 1.5, fill=PANEL, line=color, line_w=1.5)
+    text(s, 0.85, 5.15, 11.6, 1.5,
+         [[("Maka paper ini hadir.  ", 13.5, color, True), (bridge, 13.5, WHITE, False)]],
+         anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.25)
+    return s
+
+
 # ============================================================= 1. JUDUL
 s = slide()
 text(s, 0.6, 1.7, 12.1, 1.0, [[("METRIK SAFE AI", 50, INDIGO, True)]], align=PP_ALIGN.CENTER)
@@ -229,6 +247,16 @@ for (n, name, para, col, meta, desc) in cards:
     box(s, x+0.3, 4.75, 3.33, 0.02, fill=LINE)
     text(s, x+0.3, 4.95, 3.4, 1.6, [[(desc, 13, GREY, False)]], line_spacing=1.3)
     x += 4.06
+
+# ============================================================= 3b. LATAR BELAKANG SoFCLR
+bg_slide("PAPER 1 · LATAR BELAKANG", "Latar Belakang: Kenapa SoFCLR?", EMERALD,
+         "Sebelum paper ini, keadilan pada AI yang belajar tanpa label belum tergarap baik.",
+         "AI belajar-sendiri (self-supervised) seperti SimCLR dan CLIP makin dominan karena hemat "
+         "tenaga pelabelan. Tapi representasi yang dipelajari bisa diam-diam menyimpan bias dari data.",
+         "Metode pemerataan yang sudah ada biasanya menuntut data berlabel lengkap, butuh batch "
+         "(komputer) sangat besar, atau tidak punya jaminan berhasil.",
+         "SoFCLR membuat AI adil hanya dengan sedikit label, lebih hemat, dan terbukti secara "
+         "matematis (provable).")
 
 # ============================================================= 4. PAPER 1 - SoFCLR
 s = slide()
@@ -406,6 +434,16 @@ text(s, 0.85, 5.55, 11.6, 1.15,
         "misalnya 26,58 menjadi 14,93 pada CelebA, dengan akurasi tetap terjaga sekitar 85%.",
         12, GREY, False)]], anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.15)
 
+# ============================================================= 7d. LATAR BELAKANG DecodingTrust
+bg_slide("PAPER 2 · LATAR BELAKANG", "Latar Belakang: Kenapa DecodingTrust?", ROSE,
+         "Model seperti GPT cepat dipakai di aplikasi nyata, kadang sebelum risikonya dipahami.",
+         "GPT-3.5 dan GPT-4 dipakai luas untuk tugas penting, dan punya kemampuan baru: mengikuti "
+         "instruksi serta belajar dari contoh di dalam prompt.",
+         "Uji 'apakah model bisa dipercaya' masih terpencar. Tiap aspek (bias, privasi, racun, "
+         "ketahanan) diuji sendiri-sendiri, belum ada potret menyeluruh.",
+         "DecodingTrust menilai 8 aspek kepercayaan sekaligus dalam satu kerangka, disesuaikan "
+         "dengan kemampuan baru GPT.")
+
 # ============================================================= 8. PAPER 2 - DecodingTrust
 s = slide()
 header(s, "PAPER 2 · LLM", "DecodingTrust: 8 Perspektif", color=ROSE)
@@ -500,6 +538,16 @@ text(s, 0.85, 5.55, 11.6, 1.15,
        ("89,2% pada GPT-4", 12.5, ROSE, True),
        (" (kasus transfer terbaik). Dialog di atas ilustrasi konsep jailbreak.",
         12.5, GREY, False)]], anchor=MSO_ANCHOR.MIDDLE, line_spacing=1.15)
+
+# ============================================================= 8d. LATAR BELAKANG HELM
+bg_slide("PAPER 3 · LATAR BELAKANG", "Latar Belakang: Kenapa HELM?", BLUE,
+         "Jumlah model bahasa meledak, tapi cara menilainya belum seragam.",
+         "Banyak model baru bermunculan dari banyak organisasi, masing-masing dengan klaim "
+         "kemampuannya sendiri.",
+         "Tiap model sering diuji dengan benchmark berbeda dan kebanyakan hanya pada akurasi. "
+         "Akibatnya sulit dibandingkan secara adil dan kurang transparan.",
+         "HELM mengukur banyak model dengan ukuran yang sama dan banyak dimensi sekaligus, "
+         "secara terbuka.")
 
 # ============================================================= 9. PAPER 3 - HELM
 s = slide()
@@ -728,6 +776,13 @@ NOTES = [
     "DecodingTrust, memenangkan penghargaan di konferensi NeurIPS 2023, menguji model sekelas "
     "ChatGPT pada delapan aspek kepercayaan. Paper tiga, HELM, dari jurnal TMLR 2023, mengukur "
     "tiga puluh model bahasa sekaligus dengan tujuh ukuran. Berikutnya saya bahas satu per satu.",
+    # +Latar Belakang SoFCLR
+    "Sebelum masuk detail, kenapa paper ini dibuat? Belakangan, AI yang belajar sendiri tanpa "
+    "label seperti SimCLR dan CLIP makin populer karena hemat tenaga pelabelan. Tapi ada efek "
+    "samping: representasi yang dipelajari bisa diam-diam menyimpan bias dari data. Masalahnya, "
+    "metode untuk membuatnya adil yang sudah ada biasanya menuntut data berlabel lengkap, butuh "
+    "komputer sangat besar, atau tidak ada jaminan berhasil. Di sinilah SoFCLR masuk: membuat AI "
+    "adil hanya dengan sedikit label, lebih hemat, dan terbukti secara matematis.",
     # 5 SoFCLR fairness tanpa label
     "Kita mulai paper pertama, sedikit latar belakang dulu. Ada jenis AI yang belajar sendiri "
     "dari jutaan data tanpa label, tanpa kunci jawaban dari manusia. Istilahnya self-supervised "
@@ -775,6 +830,13 @@ NOTES = [
     "persen, hampir setara menebak lemparan koin. Artinya informasi gender berhasil disembunyikan, "
     "sehingga model lebih adil. Angka ini ilustrasi ya, tapi di paper aslinya ketimpangan memang "
     "turun jelas dan ketepatan model tetap terjaga.",
+    # +Latar Belakang DecodingTrust
+    "Kenapa DecodingTrust dibuat? Model seperti GPT cepat sekali dipakai di aplikasi nyata, kadang "
+    "sebelum risikonya benar-benar dipahami. Model ini juga punya kemampuan baru: bisa mengikuti "
+    "instruksi dan belajar dari contoh di dalam prompt. Sayangnya, uji apakah model bisa dipercaya "
+    "masih terpencar, tiap aspek seperti bias, privasi, dan ketahanan diuji sendiri-sendiri, belum "
+    "ada potret menyeluruh. DecodingTrust hadir untuk menilai delapan aspek kepercayaan sekaligus "
+    "dalam satu kerangka.",
     # 10 DecodingTrust 8 perspektif
     "Masuk paper kedua, DecodingTrust. Paper ini menguji model sekelas ChatGPT, yaitu GPT 3.5 dan "
     "GPT 4. Ibarat medical check-up menyeluruh, mereka memeriksa delapan aspek. Saya kelompokkan "
@@ -797,6 +859,12 @@ NOTES = [
     "menurut. Aturannya tertembus. Paper ini menemukan, dengan serangan yang dirancang khusus, "
     "tingkat keberhasilan bisa sampai delapan puluh sembilan persen pada GPT 4. Jadi model yang "
     "terlihat aman dalam kondisi normal bisa jebol kalau ada yang sengaja mengakali.",
+    # +Latar Belakang HELM
+    "Kenapa HELM dibuat? Jumlah model bahasa meledak, bermunculan dari banyak organisasi dengan "
+    "klaim masing-masing. Masalahnya, tiap model sering diuji dengan soal yang berbeda dan "
+    "kebanyakan hanya pada akurasi. Akibatnya sulit membandingkan secara adil dan kurang "
+    "transparan. HELM hadir untuk mengukur banyak model dengan ukuran yang sama dan banyak dimensi "
+    "sekaligus, secara terbuka.",
     # 12 HELM
     "Paper ketiga, HELM. Kalau dua paper tadi mendalami satu hal, HELM ini melebar. Bayangkan "
     "situs pembanding produk, atau rapor sekolah dengan banyak mata pelajaran. HELM memberi nilai "
@@ -839,10 +907,31 @@ NOTES = [
     "paper dua DecodingTrust untuk kepercayaan model bahasa, dan paper tiga HELM untuk "
     "perbandingan menyeluruh. Terima kasih, saya siap menerima pertanyaan.",
 ]
+# Judul tiap slide (urutan sama dengan NOTES) untuk file naskah terpisah.
+TITLES = [
+    "Judul", "Kenapa Butuh Metrik SAFE?", "Bagaimana Ketiga Paper Terhubung (Benang Merah)",
+    "Tiga Paper yang Dipakai", "Latar Belakang: Kenapa SoFCLR?", "SoFCLR: Fairness Tanpa Label",
+    "Cara Kerja SoFCLR", "SoFCLR per Iterasi", "Tantangan Khas Fairness di SSL",
+    "Ringkasan SoFCLR", "Contoh: Tebak Gender dari Wajah", "Latar Belakang: Kenapa DecodingTrust?",
+    "DecodingTrust: 8 Perspektif", "Ringkasan DecodingTrust", "Contoh: Jailbreak pada LLM",
+    "Latar Belakang: Kenapa HELM?", "HELM: Evaluasi Holistik", "Ringkasan HELM",
+    "Contoh: Rapor Perbandingan Model", "Sintesis (Peta 3 Paper x 4 Dimensi)",
+    "Poin Penutup", "Referensi",
+]
 for _i, _note in enumerate(NOTES):
     if _i < len(prs.slides._sldIdLst):
         prs.slides[_i].notes_slide.notes_text_frame.text = _note
 
 prs.save("/home/adb/awangga/awangga.github.io/safe/metrics/SAFE-AI-Metrics.pptx")
+
+# Tulis ulang naskah terpisah (selalu sinkron dengan NOTES).
+with open("/home/adb/awangga/awangga.github.io/safe/metrics/speaker-notes.md", "w") as f:
+    f.write("# Naskah Presentasi: Metrik SAFE AI\n\n")
+    f.write("Naskah siap baca (bahasa awam, ada analogi). Notes yang sama juga tertanam di file "
+            "`SAFE-AI-Metrics.pptx` (panel \"Notes\" PowerPoint). Estimasi durasi 10 sampai 12 "
+            "menit bila dibaca santai.\n\n---\n\n")
+    for _t, _n in zip(TITLES, NOTES):
+        f.write(f"## {_t}\n{_n}\n\n")
+
 print("Saved SAFE-AI-Metrics.pptx  |  slides:", len(prs.slides._sldIdLst),
-      "|  notes:", len(NOTES))
+      "|  notes:", len(NOTES), "|  titles:", len(TITLES))
