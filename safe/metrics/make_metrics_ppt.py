@@ -198,7 +198,65 @@ text(s, 7.08, 5.25, 5.4, 1.1,
        (", menyiasati global contrastive loss yang mahal.", 12.5, GREY, False)]],
      line_spacing=1.25)
 
-# ============================================================= 5. PAPER 1 - TANTANGAN
+# ============================================================= 5. PAPER 1 - ALGORITMA (OBJEKTIF)
+s = slide()
+header(s, "PAPER 1 · ALGORITMA", "Cara Kerja SoFCLR", color=EMERALD)
+text(s, 0.6, 1.45, 12.1, 0.45,
+     [[("SoFCLR = Stochastic Optimization for Fair Contrastive Learning", 13, GREY, False)]])
+# fungsi objektif
+box(s, 1.4, 2.0, 10.5, 1.2, fill=PANEL, line=EMERALD, line_w=1.5)
+text(s, 1.4, 2.0, 10.5, 1.2,
+     [[("F(w, w′)  =  F_GCL(w)  +  α · F_fair(w, w′)", 23, EMERALD, True)]],
+     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+text(s, 0.6, 3.3, 12.1, 0.4,
+     [[("minimalkan terhadap encoder w  ·  maksimalkan terhadap diskriminator w′  ·  "
+        "α = bobot trade-off (fairness ↔ akurasi)", 12, GREY, False)]],
+     align=PP_ALIGN.CENTER)
+box(s, 0.6, 3.9, 6.0, 2.7, fill=PANEL, line=EMERALD, line_w=1.5)
+text(s, 0.85, 4.05, 5.5, 0.4, [[("Suku F_GCL  (representasi)", 15, EMERALD, True)]])
+text(s, 0.85, 4.6, 5.5, 1.9,
+     [[("Global contrastive loss: tarik dua augmentasi gambar yang sama agar berdekatan, "
+        "dorong menjauh dari semua sampel lain. Menjaga representasi tetap kaya dan informatif.",
+        13, GREY, False)]], line_spacing=1.3)
+box(s, 6.73, 3.9, 6.0, 2.7, fill=PANEL, line=ROSE, line_w=1.5)
+text(s, 6.98, 4.05, 5.5, 0.4, [[("Suku F_fair  (fairness)", 15, ROSE, True)]])
+text(s, 6.98, 4.6, 5.5, 1.9,
+     [[("Diskriminator berusaha menebak atribut sensitif (mis. gender) dari representasi. "
+        "Encoder dilatih agar diskriminator ", 13, GREY, False),
+       ("gagal", 13, WHITE, True),
+       (", sehingga representasi tidak membawa informasi sensitif.", 13, GREY, False)]],
+     line_spacing=1.3)
+
+# ============================================================= 6. PAPER 1 - ALGORITMA (LANGKAH)
+s = slide()
+header(s, "PAPER 1 · ALGORITMA", "SoFCLR per Iterasi", color=EMERALD)
+box(s, 0.6, 1.6, 7.0, 5.05, fill=PANEL, line=EMERALD, line_w=1.5)
+text(s, 0.9, 1.78, 6.4, 0.4, [[("Langkah tiap iterasi", 15, EMERALD, True)]])
+steps = [
+    ("1", "Ambil 1 batch data tak berlabel + 1 batch kecil yang berlabel atribut sensitif."),
+    ("2", "Buat 2 augmentasi tiap sampel; perbarui moving-average u (estimator suku contrastive)."),
+    ("3", "Hitung gradien dari nilai u, lalu haluskan dengan momentum."),
+    ("4", "Encoder turun gradien:   w ← w − η · g"),
+    ("5", "Diskriminator naik gradien:   w′ ← w′ + η′ · v"),
+]
+y = 2.3
+for (n, b) in steps:
+    text(s, 0.95, y, 0.5, 0.8, [[(n, 18, EMERALD, True)]], anchor=MSO_ANCHOR.TOP)
+    text(s, 1.5, y, 5.85, 0.85, [[(b, 13, GREY, False)]], line_spacing=1.2)
+    y += 0.84
+box(s, 7.8, 1.6, 4.93, 2.45, fill=PANEL, line=LINE)
+text(s, 8.05, 1.78, 4.4, 0.4, [[("Kenapa pakai moving-average u?", 14, WHITE, True)]])
+text(s, 8.05, 2.3, 4.4, 1.6,
+     [[("Minibatch untuk contrastive bersifat bias karena tiap anchor seharusnya dibandingkan "
+        "dengan seluruh dataset. Vektor u melacak nilai itu lintas iterasi sehingga error "
+        "mengecil, tanpa perlu batch raksasa seperti SimCLR.", 12.5, GREY, False)]], line_spacing=1.25)
+box(s, 7.8, 4.2, 4.93, 2.45, fill=PANEL, line=EMERALD, line_w=1.5)
+text(s, 8.05, 4.38, 4.4, 0.4, [[("Jaminan konvergensi", 14, EMERALD, True)]])
+text(s, 8.05, 4.9, 4.4, 1.6,
+     [[("Terbukti mencapai titik ε-stationary dalam O(ε⁻⁴) iterasi: setara SGD untuk "
+        "optimisasi non-convex, dan tanpa syarat batch besar.", 12.5, GREY, False)]], line_spacing=1.25)
+
+# ============================================================= 7. PAPER 1 - INTI (TANTANGAN)
 s = slide()
 header(s, "PAPER 1 · INTI", "Tantangan Khas Fairness di SSL", color=EMERALD)
 pts = [
@@ -218,7 +276,7 @@ for i, (t, b) in enumerate(pts, 1):
          [[(t, 16, WHITE, True)], [(b, 13, GREY, False)]], space_after=4, anchor=MSO_ANCHOR.MIDDLE)
     y += 1.65
 
-# ============================================================= 6. PAPER 2 - DecodingTrust
+# ============================================================= 8. PAPER 2 - DecodingTrust
 s = slide()
 header(s, "PAPER 2 · LLM", "DecodingTrust: 8 Perspektif", color=ROSE)
 text(s, 0.6, 1.45, 12.1, 0.55,
@@ -252,7 +310,7 @@ text(s, 0.85, 5.0, 11.6, 1.6,
         13.5, GREY, False)]],
      anchor=MSO_ANCHOR.MIDDLE, space_after=6, line_spacing=1.2)
 
-# ============================================================= 7. PAPER 3 - HELM
+# ============================================================= 9. PAPER 3 - HELM
 s = slide()
 header(s, "PAPER 3 · LLM", "HELM: Evaluasi Holistik", color=BLUE)
 text(s, 0.6, 1.45, 12.1, 0.55,
@@ -289,7 +347,7 @@ text(s, 6.98, 4.55, 5.5, 1.9,
        ("; disparitas langsung diukur bila metadata ada.", 13, GREY, False)]],
      line_spacing=1.3)
 
-# ============================================================= 8. SINTESIS MATRIKS
+# ============================================================= 10. SINTESIS MATRIKS
 s = slide()
 header(s, "SINTESIS", "Peta 3 Paper × 4 Dimensi SAFE")
 # header kolom
@@ -328,7 +386,7 @@ text(s, 0.85, 5.0, 11.6, 1.6,
         "bukan sekadar belum sempat dicari.", 13.5, GREY, False)]],
      anchor=MSO_ANCHOR.MIDDLE, space_after=6, line_spacing=1.2)
 
-# ============================================================= 9. KESIMPULAN
+# ============================================================= 11. KESIMPULAN
 s = slide()
 header(s, "PENUTUP", "Tiga Pelajaran", color=INDIGO)
 takeaways = [
@@ -351,7 +409,7 @@ text(s, 0.6, 6.55, 12.1, 0.5,
         14, INDIGO_L, True)]],
      align=PP_ALIGN.CENTER)
 
-# ============================================================= 10. REFERENSI
+# ============================================================= 12. REFERENSI
 s = slide()
 header(s, "REFERENSI", "3 Paper")
 refs = [
