@@ -16,6 +16,7 @@ Konten:
 1. [Mamba (State Space Model)](./mamba) — arsitektur pengganti Transformer
 2. [SSM](./ssm) — State Space Model
 3. [SAFE AI — Secure](./safe) — keamanan AI: threat model, serangan & pertahanan (demo interaktif)
+4. [Metrik SAFE AI](./safe/metrics) — telaah 3 paper: mengukur SAFE pada SSL & Transformer/LLM (slide PPT)
 
 ## Adaptive Learning
 
