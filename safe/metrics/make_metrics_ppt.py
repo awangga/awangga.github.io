@@ -139,7 +139,7 @@ text(s, 0.85, 5.7, 11.6, 1.0,
 
 # ============================================================= 3. PETA 3 PAPER
 s = slide()
-header(s, "PETA", "Tiga Paper, Tiga Sudut")
+header(s, "PETA", "Tiga Paper yang Dipakai")
 cards = [
     ("1", "SoFCLR", "SSL / Contrastive", EMERALD,
      "Qi, Hu, Lin & Yang\narXiv:2406.05686 · 2024",
@@ -164,7 +164,7 @@ for (n, name, para, col, meta, desc) in cards:
 
 # ============================================================= 4. PAPER 1 - SoFCLR
 s = slide()
-header(s, "PAPER 1 · SSL", "SoFCLR — Fairness Tanpa Label", color=EMERALD)
+header(s, "PAPER 1 · SSL", "SoFCLR: Fairness Tanpa Label", color=EMERALD)
 text(s, 0.6, 1.45, 12.1, 0.55,
      [[("Provable Optimization for Adversarial Fair Self-supervised Contrastive Learning",
         14, EMERALD, True)]])
@@ -195,7 +195,7 @@ text(s, 7.08, 4.75, 5.4, 0.4, [[("Kontribusi", 14, EMERALD, True)]])
 text(s, 7.08, 5.25, 5.4, 1.1,
      [[("Algoritma stokastik dengan jaminan konvergensi ", 12.5, GREY, False),
        ("tanpa perlu batch besar", 12.5, WHITE, True),
-       (" — menyiasati global contrastive loss yang mahal.", 12.5, GREY, False)]],
+       (", menyiasati global contrastive loss yang mahal.", 12.5, GREY, False)]],
      line_spacing=1.25)
 
 # ============================================================= 5. PAPER 1 - TANTANGAN
@@ -206,7 +206,7 @@ pts = [
      "tanpa keduanya, jadi metrik fairness harus dirancang ulang untuk tahap representasi."),
     ("Optimisasi sulit", "Minimax-nya non-convex non-concave, diperberat global contrastive loss yang "
      "membandingkan tiap sampel dengan semua sampel lain. SoFCLR memberi solusi terbukti (provable)."),
-    ("Bukan otomatis adil", "Penulis menegaskan SSL tidak inheren adil — pra-pelatihan tetap dapat "
+    ("Bukan otomatis adil", "Penulis menegaskan SSL tidak inheren adil; pra-pelatihan tetap dapat "
      "menyandi bias bila tidak diberi sinyal fairness eksplisit."),
 ]
 y = 1.7
@@ -220,7 +220,7 @@ for i, (t, b) in enumerate(pts, 1):
 
 # ============================================================= 6. PAPER 2 - DecodingTrust
 s = slide()
-header(s, "PAPER 2 · LLM", "DecodingTrust — 8 Perspektif", color=ROSE)
+header(s, "PAPER 2 · LLM", "DecodingTrust: 8 Perspektif", color=ROSE)
 text(s, 0.6, 1.45, 12.1, 0.55,
      [[("A Comprehensive Assessment of Trustworthiness in GPT Models  ·  Wang et al., NeurIPS 2023",
         13, ROSE, True)]])
@@ -245,7 +245,7 @@ box(s, 0.6, 4.85, 12.13, 1.85, fill=PANEL, line=ROSE, line_w=1.5)
 text(s, 0.85, 5.0, 11.6, 1.6,
      [[("Metrik konkret.  ", 14, ROSE, True),
        ("Robustness diuji dengan benchmark AdvGLUE / AdvGLUE++ (serangan TextFooler, SemAttack, "
-        "BERT-ATTACK) — Attack Success Rate mencapai 89,2% pada GPT-4 (kasus transfer terbaik). ",
+        "BERT-ATTACK). Attack Success Rate mencapai 89,2% pada GPT-4 (kasus transfer terbaik). ",
         13.5, WHITE, False)],
       [("Fairness diukur lewat base-rate parity antar kelompok demografi, dan menemukan trade-off "
         "akurasi-fairness: GPT-4 lebih akurat pada data seimbang, tapi lebih tidak adil pada data timpang.",
@@ -254,7 +254,7 @@ text(s, 0.85, 5.0, 11.6, 1.6,
 
 # ============================================================= 7. PAPER 3 - HELM
 s = slide()
-header(s, "PAPER 3 · LLM", "HELM — Evaluasi Holistik", color=BLUE)
+header(s, "PAPER 3 · LLM", "HELM: Evaluasi Holistik", color=BLUE)
 text(s, 0.6, 1.45, 12.1, 0.55,
      [[("Holistic Evaluation of Language Models  ·  Liang, Bommasani, Lee et al., TMLR 2023",
         13, BLUE, True)]])
@@ -324,7 +324,7 @@ text(s, 0.85, 5.0, 11.6, 1.6,
      [[("Yang belum tertutup.  ", 14, AMBER, True),
        ("Explainable dan Accountable masih lemah: hanya diproksikan lewat etika/toxicity, "
         "belum ada metrik audit-trail / model-card yang baku. ", 13.5, WHITE, False)],
-      [("AutoML tidak punya satu pun paper metrik SAFE yang lolos verifikasi — ini gap riset nyata, "
+      [("AutoML tidak punya satu pun paper metrik SAFE yang lolos verifikasi. Ini gap riset nyata, "
         "bukan sekadar belum sempat dicari.", 13.5, GREY, False)]],
      anchor=MSO_ANCHOR.MIDDLE, space_after=6, line_spacing=1.2)
 
@@ -347,7 +347,7 @@ for i, (t, b) in enumerate(takeaways, 1):
          [[(t, 17, WHITE, True)], [(b, 13.5, GREY, False)]], space_after=3, anchor=MSO_ANCHOR.MIDDLE)
     y += 1.45
 text(s, 0.6, 6.55, 12.1, 0.5,
-     [[("Mengukur SAFE adalah syarat untuk memperbaikinya: yang tak terukur tak bisa diperbaiki.",
+     [[("Ketiga paper menyediakan metrik yang bisa langsung dipakai untuk menguji SAFE pada model nyata.",
         14, INDIGO_L, True)]],
      align=PP_ALIGN.CENTER)
 
@@ -357,13 +357,13 @@ header(s, "REFERENSI", "3 Paper")
 refs = [
     ("[1]", "Provable Optimization for Adversarial Fair Self-supervised Contrastive Learning",
      "Qi, Hu, Lin & Yang · 2024 · arXiv:2406.05686", EMERALD,
-     "SSL — Fairness. Metrik: 8 notasi fairness; metode minimax adversarial."),
+     "Paradigma SSL, dimensi Fairness. Metrik: 8 notasi fairness; metode minimax adversarial."),
     ("[2]", "DecodingTrust: A Comprehensive Assessment of Trustworthiness in GPT Models",
      "Wang et al. · NeurIPS 2023 (Outstanding Paper) · arXiv:2306.11698", ROSE,
-     "LLM — Secure/Fair/Accountable. 8 perspektif; AdvGLUE++ ASR hingga 89,2%."),
+     "LLM, dimensi Secure/Fair/Accountable. 8 perspektif; AdvGLUE++ ASR hingga 89,2%."),
     ("[3]", "Holistic Evaluation of Language Models (HELM)",
      "Liang, Bommasani, Lee et al. · TMLR 2023 · arXiv:2211.09110", BLUE,
-     "LLM — multi-metrik. 7 metrik × 16 skenario; robustness & fairness worst-case."),
+     "LLM, evaluasi multi-metrik. 7 metrik × 16 skenario; robustness & fairness worst-case."),
 ]
 y = 1.7
 for (n, t, meta, col, why) in refs:
